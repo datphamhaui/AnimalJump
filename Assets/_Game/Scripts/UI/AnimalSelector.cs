@@ -12,17 +12,22 @@ public class AnimalSelector : MonoBehaviour
     [SerializeField] private Button _selectButton;
     
     [Header("Animal Info Display")]
-    [Tooltip("Text hiển thị tên động vật")]
+    [Tooltip("Text hiển thị tên động vật (ở dưới)")]
     [SerializeField] private TMP_Text _animalNameText;
     
-    [Tooltip("Text hiển thị trạng thái (Locked/Unlocked)")]
-    [SerializeField] private TMP_Text _statusText;
+    [Header("Lock/Unlock UI")]
+    [Tooltip("Image khóa hiển thị khi animal bị lock (overlay trên animal model)")]
+    [SerializeField] private Image _lockImage;
     
-    [Tooltip("Text hiển thị giá (khi locked)")]
-    [SerializeField] private TMP_Text _priceText;
+    [Tooltip("Text hiển thị số coin cần unlock (hiển thị ở giữa màn hình khi locked)")]
+    [SerializeField] private TMP_Text _unlockCostText;
+
+    [Tooltip("Button 'Unlock' màu đỏ (góc dưới phải)")]
+    [SerializeField] private Button _unlockButton;
     
-    [Tooltip("GameObject chứa price display (ẩn khi unlocked)")]
-    [SerializeField] private GameObject _priceDisplay;
+    [Header("Optional - Advanced")]
+    [Tooltip("GameObject chứa unlock UI (bao gồm cost text, có thể ẩn/hiện cả nhóm)")]
+    [SerializeField] private GameObject _unlockUIGroup;
 
     private AnimalOwnershipManager _ownershipManager;
     private CurrencyManager _currencyManager;
@@ -37,13 +42,19 @@ public class AnimalSelector : MonoBehaviour
             _selectButton.onClick.AddListener(OnSelectButtonClicked);
         }
 
-        // Listen to panel change
-        if (_simpleScrollSnap != null)
+        if (_unlockButton != null)
         {
-            _simpleScrollSnap.onPanelChanged.AddListener(OnPanelChanged);
+            _unlockButton.onClick.AddListener(OnUnlockButtonClicked);
         }
 
-        // Update display for initial panel
+        // Listen to panel selection events
+        if (_simpleScrollSnap != null)
+        {
+            _simpleScrollSnap.OnPanelSelected.AddListener(OnPanelSelected);
+            _simpleScrollSnap.OnPanelSelecting.AddListener(OnPanelSelecting);
+        }
+
+        // Initial update (event sẽ không trigger ngay trong Start)
         UpdateAnimalInfo();
     }
 
@@ -60,25 +71,39 @@ public class AnimalSelector : MonoBehaviour
     }
 
     /// <summary>
-    /// Xử lý khi panel thay đổi
+    /// Xử lý khi panel đang được selecting (drag)
     /// </summary>
-    private void OnPanelChanged()
+    private void OnPanelSelecting(int panelIndex)
     {
         UpdateAnimalInfo();
     }
 
     /// <summary>
+    /// Xử lý khi panel đã được selected (button click hoặc snap)
+    /// </summary>
+    private void OnPanelSelected(int panelIndex)
+    {
+        Debug.Log($"[OnPanelSelected] panelIndex from event: {panelIndex}, SelectedPanel: {_simpleScrollSnap.SelectedPanel}, CenteredPanel: {_simpleScrollSnap.CenteredPanel}");
+        
+        // Dùng CenteredPanel vì nó được cập nhật TRƯỚC khi event invoke
+        UpdateAnimalInfo(_simpleScrollSnap.CenteredPanel);
+    }
+
+    /// <summary>
     /// Cập nhật thông tin động vật hiển thị
     /// </summary>
-    private void UpdateAnimalInfo()
+    private void UpdateAnimalInfo(int? overridePanelIndex = null)
     {
         if (_simpleScrollSnap == null || _ownershipManager == null) return;
 
-        // Lấy animal type từ panel hiện tại
-        int selectedPanel = _simpleScrollSnap.SelectedPanel + 1;
-        AnimalType currentAnimal = AnimalTypeExtensions.FromPanelIndex(selectedPanel);
+        // Lấy animal type từ panel hiện tại (hoặc override từ event)
+        int selectedPanel = overridePanelIndex ?? _simpleScrollSnap.SelectedPanel;
+        int panelIndexForAnimal = selectedPanel + 1;
+        AnimalType currentAnimal = AnimalTypeExtensions.FromPanelIndex(panelIndexForAnimal);
+        
+        Debug.Log($"[UpdateAnimalInfo] selectedPanel: {selectedPanel}, panelIndexForAnimal: {panelIndexForAnimal}");
 
-        // Cập nhật tên
+        // Cập nhật tên động vật (luôn hiển thị)
         if (_animalNameText != null)
         {
             _animalNameText.text = currentAnimal.GetDisplayName();
@@ -86,69 +111,101 @@ public class AnimalSelector : MonoBehaviour
 
         // Check unlock status
         bool isUnlocked = _ownershipManager.IsAnimalUnlocked(currentAnimal);
+        int price = _ownershipManager.GetAnimalPrice(currentAnimal);
 
-        // Cập nhật status text
-        if (_statusText != null)
+        // Cập nhật Lock Image (hiển thị khi locked)
+        if (_lockImage != null)
         {
-            if (isUnlocked)
+            _lockImage.gameObject.SetActive(!isUnlocked);
+        }
+
+        // Cập nhật Unlock Cost Text (hiển thị giá khi locked)
+        if (_unlockCostText != null)
+        {
+            if (!isUnlocked)
             {
-                _statusText.text = "Unlocked";
-                _statusText.color = Color.green;
+                _unlockCostText.gameObject.SetActive(true);
+                _unlockCostText.text = $"{price}";
+                
+                // Đổi màu text dựa trên affordability
+                if (_currencyManager != null)
+                {
+                    _unlockCostText.color = _currencyManager.HasEnoughCoins(price) 
+                        ? Color.white 
+                        : Color.red;
+                }
             }
             else
             {
-                _statusText.text = "Locked";
-                _statusText.color = Color.red;
+                _unlockCostText.gameObject.SetActive(false);
             }
         }
 
-        // Cập nhật price display
-        if (_priceDisplay != null)
+        // Cập nhật Unlock Button (chỉ hiển thị khi locked)
+        if (_unlockButton != null)
         {
-            _priceDisplay.SetActive(!isUnlocked);
-        }
+            _unlockButton.gameObject.SetActive(!isUnlocked);
 
-        if (_priceText != null && !isUnlocked)
-        {
-            int price = _ownershipManager.GetAnimalPrice(currentAnimal);
-            _priceText.text = $"{price}";
-
-            // Đổi màu nếu không đủ coin
-            if (_currencyManager != null)
+            // Enable/disable button dựa trên số coin
+            if (_currencyManager != null && !isUnlocked)
             {
-                _priceText.color = _currencyManager.HasEnoughCoins(price) 
-                    ? Color.white 
-                    : Color.red;
+                _unlockButton.interactable = _currencyManager.HasEnoughCoins(price);
             }
         }
+        
+        // Cập nhật Unlock UI Group (nếu có)
+        if (_unlockUIGroup != null)
+        {
+            _unlockUIGroup.SetActive(!isUnlocked);
+        }
 
-        // Cập nhật button text
-        UpdateSelectButton(currentAnimal, isUnlocked);
+        // Cập nhật Select Button (chỉ hiển thị khi unlocked)
+        if (_selectButton != null)
+        {
+            _selectButton.gameObject.SetActive(isUnlocked);
+        }
+        
+        // Debug log để kiểm tra
+        Debug.Log($"[AnimalSelector] Animal: {currentAnimal}, Unlocked: {isUnlocked}, Price: {price}, Has enough coins: {_currencyManager?.HasEnoughCoins(price)}");
     }
 
     /// <summary>
-    /// Cập nhật text của button Select
+    /// Xử lý khi nhấn nút Unlock
     /// </summary>
-    private void UpdateSelectButton(AnimalType animal, bool isUnlocked)
+    private void OnUnlockButtonClicked()
     {
-        if (_selectButton == null) return;
+        if (_simpleScrollSnap == null || _ownershipManager == null || _currencyManager == null)
+            return;
 
-        TMP_Text buttonText = _selectButton.GetComponentInChildren<TMP_Text>();
-        if (buttonText != null)
+        // Lấy động vật hiện tại
+        int selectedPanel = _simpleScrollSnap.SelectedPanel + 1;
+        AnimalType currentAnimal = AnimalTypeExtensions.FromPanelIndex(selectedPanel);
+
+        // Kiểm tra xem đã unlock chưa
+        if (_ownershipManager.IsAnimalUnlocked(currentAnimal))
         {
-            if (isUnlocked)
-            {
-                buttonText.text = "SELECT";
-            }
-            else
-            {
-                int price = _ownershipManager.GetAnimalPrice(animal);
-                buttonText.text = $"BUY ({price} COINS)";
-            }
+            Debug.Log($"{currentAnimal} đã được unlock rồi!");
+            return;
         }
 
-        // Button luôn interactable (locked = mua, unlocked = chọn)
-        _selectButton.interactable = true;
+        // Thử mua động vật
+        bool purchaseSuccess = _ownershipManager.PurchaseAnimal(currentAnimal);
+
+        if (purchaseSuccess)
+        {
+            Debug.Log($"Successfully unlocked {currentAnimal}!");
+            
+            // Cập nhật UI để phản ánh trạng thái mới
+            UpdateAnimalInfo();
+            
+            // TODO: Có thể thêm animation/effect mua thành công ở đây
+        }
+        else
+        {
+            Debug.Log($"Not enough coins to unlock {currentAnimal}!");
+            
+            // TODO: Có thể hiển thị popup "Not enough coins" ở đây
+        }
     }
 
     /// <summary>
@@ -179,28 +236,8 @@ public class AnimalSelector : MonoBehaviour
         }
         else
         {
-            // Chưa unlock → Mua
-            bool success = _ownershipManager.PurchaseAnimal(selectedAnimal);
-            
-            if (success)
-            {
-                Debug.Log($"[AnimalSelector] Purchased {selectedAnimal.GetDisplayName()}!");
-                
-                // Play sound
-                if (SoundController.GetInstance() != null)
-                {
-                    SoundController.GetInstance().PlayAudio(AudioType.BUTTON_CLICK);
-                }
-
-                // Cập nhật UI
-                UpdateAnimalInfo();
-            }
-            else
-            {
-                Debug.LogWarning($"[AnimalSelector] Cannot purchase {selectedAnimal.GetDisplayName()}");
-                
-                // TODO: Show "Not enough coins" popup
-            }
+            // Không nên xảy ra vì Select button chỉ hiển thị khi unlocked
+            Debug.LogWarning($"[AnimalSelector] Cannot select {selectedAnimal} - not unlocked!");
         }
     }
 

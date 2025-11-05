@@ -29,16 +29,16 @@
     - [ ] Display Name: `"Kangaroo"`
     - [ ] Price: `0`
   - [ ] Element 1:
-    - [ ] Animal Type: `Elephant`
-    - [ ] Display Name: `"Elephant"`
+    - [ ] Animal Type: `Tiger`
+    - [ ] Display Name: `"Tiger"`
     - [ ] Price: `500`
   - [ ] Element 2:
-    - [ ] Animal Type: `Lion`
-    - [ ] Display Name: `"Lion"`
+    - [ ] Animal Type: `Monkey`
+    - [ ] Display Name: `"Monkey"`
     - [ ] Price: `1000`
   - [ ] Element 3:
-    - [ ] Animal Type: `Bear`
-    - [ ] Display Name: `"Bear"`
+    - [ ] Animal Type: `Gorilla`
+    - [ ] Display Name: `"Gorilla"`
     - [ ] Price: `1500`
 
 ### 1.3 Verify Managers Setup
@@ -137,9 +137,9 @@
 - [ ] Check Console shows:
   ```
   Kangaroo: ✅ Unlocked
-  Elephant: 🔒 Locked (500 coins)
-  Lion: 🔒 Locked (1000 coins)
-  Bear: 🔒 Locked (1500 coins)
+  Tiger: 🔒 Locked (500 coins)
+  Monkey: 🔒 Locked (1000 coins)
+  Gorilla: 🔒 Locked (1500 coins)
   ```
 - [ ] Stop playing
 
@@ -153,7 +153,7 @@
   - [ ] Click SELECT
   - [ ] Should load game scene successfully
 - [ ] Go back to Animal Selection
-- [ ] Try to select locked animal (Elephant):
+- [ ] Try to select locked animal (Tiger):
   - [ ] If not enough coins: Nothing happens (need to add "not enough coins" popup later)
   - [ ] If enough coins: Buy successfully → Status changes to "Unlocked"
 
@@ -169,7 +169,7 @@
 ### 4.5 Purchase Test
 - [ ] Use Debug: Add 1000 Coins
 - [ ] Go to Animal Selection
-- [ ] Buy Elephant (500 coins):
+- [ ] Buy Tiger (500 coins):
   - [ ] Click BUY button
   - [ ] Check Console: Purchase successful
   - [ ] Check coin: 1000 - 500 = 500
@@ -177,7 +177,7 @@
   - [ ] Status changes to "Unlocked"
 - [ ] Try to buy again:
   - [ ] Should show "already unlocked" in console
-- [ ] Buy Lion (1000 coins):
+- [ ] Buy Monkey (1000 coins):
   - [ ] Should fail (only have 500)
   - [ ] Check console warning
 
@@ -201,10 +201,10 @@
   1. [ ] Start game → Kangaroo unlocked, 0 coins
   2. [ ] Win Level 1 → Get coins (e.g., 200 coins with 3 stars)
   3. [ ] Go to Animal Selection → See locked animals
-  4. [ ] Buy Elephant (500 coins) → Fail (not enough)
+  4. [ ] Buy Tiger (500 coins) → Fail (not enough)
   5. [ ] Win more levels → Get more coins
-  6. [ ] Buy Elephant → Success
-  7. [ ] Select Elephant → Play with Elephant
+  6. [ ] Buy Tiger → Success
+  7. [ ] Select Tiger → Play with Tiger
   8. [ ] Exit game
   9. [ ] Restart → Coins and unlocks persisted
 

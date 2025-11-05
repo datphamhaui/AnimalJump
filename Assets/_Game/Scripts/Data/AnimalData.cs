@@ -37,9 +37,9 @@ public static class AnimalTypeExtensions
         return type switch
         {
             AnimalType.Kangaroo => "Kangaroo",
-            AnimalType.Elephant => "Elephant",
-            AnimalType.Lion => "Lion",
-            AnimalType.Bear => "Bear",
+            AnimalType.Tiger => "Tiger",
+            AnimalType.Monkey => "Monkey",
+            AnimalType.Gorilla => "Gorilla",
             _ => type.ToString()
         };
     }
@@ -52,9 +52,9 @@ public static class AnimalTypeExtensions
         return type switch
         {
             AnimalType.Kangaroo => 0,      // Free (default)
-            AnimalType.Elephant => 500,    // 500 coins
-            AnimalType.Lion => 1000,       // 1000 coins
-            AnimalType.Bear => 1500,       // 1500 coins
+            AnimalType.Tiger => 500,       // 500 coins
+            AnimalType.Monkey => 1000,     // 1000 coins
+            AnimalType.Gorilla => 1500,    // 1500 coins
             _ => 0
         };
     }
@@ -67,9 +67,9 @@ public static class AnimalTypeExtensions
         return type switch
         {
             AnimalType.Kangaroo => "The default jumper!",
-            AnimalType.Elephant => "Strong and steady.",
-            AnimalType.Lion => "King of the jungle.",
-            AnimalType.Bear => "Powerful and brave.",
+            AnimalType.Tiger => "Fast and fierce.",
+            AnimalType.Monkey => "Agile and quick.",
+            AnimalType.Gorilla => "Strong and powerful.",
             _ => ""
         };
     }

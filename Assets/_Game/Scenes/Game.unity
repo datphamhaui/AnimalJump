@@ -981,10 +981,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animalAnimators:
-  - {fileID: 9100000, guid: c13694fc35d144f0faf1b2b5064b992d, type: 2}
   - {fileID: 9100000, guid: 0b4905dab0fb48346a2b31ea9cf13fcc, type: 2}
-  - {fileID: 9100000, guid: 34ac4dace6e9543c8ace11d4cb4f3732, type: 2}
   - {fileID: 9100000, guid: 92e834cb9606f47c8858bf79b4c51e3f, type: 2}
+  - {fileID: 9100000, guid: 34ac4dace6e9543c8ace11d4cb4f3732, type: 2}
+  - {fileID: 9100000, guid: c13694fc35d144f0faf1b2b5064b992d, type: 2}
   _jumpAnimationSpeed: 1.5
 --- !u!114 &247838771
 MonoBehaviour:
@@ -1012,10 +1012,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animalModelPrefabs:
-  - {fileID: 632962627720370843, guid: de12c6a96169cf4499ac29721aa1199b, type: 3}
   - {fileID: 2312664998685923844, guid: 9407d9eb11ec577469f8c8b8f75a54c6, type: 3}
-  - {fileID: 870608090197971778, guid: 4a4b19d3394579c418e86e94bf3110ec, type: 3}
   - {fileID: 4357152000951934353, guid: 9b3829afe6326be4985f4bfd7a12cfb5, type: 3}
+  - {fileID: 870608090197971778, guid: 4a4b19d3394579c418e86e94bf3110ec, type: 3}
+  - {fileID: 632962627720370843, guid: de12c6a96169cf4499ac29721aa1199b, type: 3}
 --- !u!1001 &302699565
 PrefabInstance:
   m_ObjectHideFlags: 0

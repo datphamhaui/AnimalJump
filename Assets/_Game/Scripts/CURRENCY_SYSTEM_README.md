@@ -254,9 +254,9 @@ Trigger events → UI auto-update
 | Động vật | Giá | Status mặc định |
 |----------|-----|-----------------|
 | 🦘 Kangaroo | 0 (Free) | ✅ Unlocked |
-| 🐘 Elephant | 500 coins | 🔒 Locked |
-| 🦁 Lion | 1000 coins | 🔒 Locked |
-| 🐻 Bear | 1500 coins | 🔒 Locked |
+| � Tiger | 500 coins | 🔒 Locked |
+| 🐵 Monkey | 1000 coins | 🔒 Locked |
+| 🦍 Gorilla | 1500 coins | 🔒 Locked |
 
 ---
 

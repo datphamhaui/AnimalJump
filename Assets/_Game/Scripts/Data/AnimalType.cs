@@ -5,7 +5,7 @@ using UnityEngine;
 public enum AnimalType
 {
     Kangaroo = 0,
-    Elephant = 1,
-    Lion     = 2,
-    Bear     = 3
+    Tiger    = 1,
+    Monkey   = 2,
+    Gorilla  = 3
 }
