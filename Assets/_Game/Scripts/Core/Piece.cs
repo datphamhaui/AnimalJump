@@ -15,13 +15,13 @@ public class Piece : MonoBehaviour
 
     [Header("Coin Settings")]
     [SerializeField] private GameObject _coinObject;
-    [Tooltip("Xác suất xuất hiện coin (0-1). 0.5 = 50% chance")]
-    [SerializeField] private float _coinSpawnChance = 0.5f;
+    [Tooltip("Xác suất xuất hiện coin (0-1). 0.2 = 20% chance")]
+    [SerializeField] private float _coinSpawnChance = 0.2f;
 
     [Header("Heart Settings")]
     [SerializeField] private GameObject _heartObject;
-    [Tooltip("Xác suất xuất hiện heart (0-1). 0.3 = 30% chance")]
-    [SerializeField] private float _heartSpawnChance = 0.3f;
+    [Tooltip("Xác suất xuất hiện heart (0-1). 0.15 = 15% chance")]
+    [SerializeField] private float _heartSpawnChance = 0.15f;
 
     private LevelManager _levelManager;
     private Coin _coin;
