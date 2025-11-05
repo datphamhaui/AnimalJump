@@ -52,9 +52,9 @@ MonoBehaviour:
   col: {fileID: 8067706021499681301}
   _safeLandingZoneRatio: 0.8
   _coinObject: {fileID: 1715803062908661546}
-  _coinSpawnChance: 0.1
+  _coinSpawnChance: 0.06
   _heartObject: {fileID: 2395908072452205626}
-  _heartSpawnChance: 0.07
+  _heartSpawnChance: 0.01
   _renderer: {fileID: 5292375335589968173}
   _data: {fileID: 11400000, guid: 96f7c8b6dc7c87844a33bbc16e302bcc, type: 2}
   <HalfWidth>k__BackingField: 1.5
