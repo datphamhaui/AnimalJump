@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// Quản lý tiến độ của người chơi qua các level
@@ -11,8 +13,10 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     [Tooltip("Danh sách tất cả các level trong game (theo thứ tự)")]
     [SerializeField] private LevelDataSO[] _allLevels;
 
-    private const string LEVEL_UNLOCK_KEY = "LevelUnlock_";
-    private const string LEVEL_STARS_KEY = "LevelStars_";
+    [SerializeField] private Button _backButton;
+
+    private const string LEVEL_UNLOCK_KEY  = "LevelUnlock_";
+    private const string LEVEL_STARS_KEY   = "LevelStars_";
     private const string CURRENT_LEVEL_KEY = "CurrentLevel";
 
     public static event Action<int, int> OnLevelCompleted; // levelNumber, stars
@@ -20,12 +24,14 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     protected override void Awake()
     {
         base.Awake();
-        
+
         // Level 1 luôn unlock
         if (!IsLevelUnlocked(1))
         {
             UnlockLevel(1);
         }
+
+        _backButton.onClick.AddListener(this.BackButtonOnClick);
     }
 
     #region Level Access
@@ -38,6 +44,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
         if (levelNumber < 1 || levelNumber > _allLevels.Length)
         {
             Debug.LogError($"Level {levelNumber} không tồn tại!");
+
             return null;
         }
 
@@ -56,10 +63,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     /// <summary>
     /// Kiểm tra level đã unlock chưa
     /// </summary>
-    public bool IsLevelUnlocked(int levelNumber)
-    {
-        return PlayerPrefs.GetInt(LEVEL_UNLOCK_KEY + levelNumber, 0) == 1;
-    }
+    public bool IsLevelUnlocked(int levelNumber) { return PlayerPrefs.GetInt(LEVEL_UNLOCK_KEY + levelNumber, 0) == 1; }
 
     /// <summary>
     /// Unlock một level
@@ -74,10 +78,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     /// <summary>
     /// Lấy số sao của một level (0-3)
     /// </summary>
-    public int GetLevelStars(int levelNumber)
-    {
-        return PlayerPrefs.GetInt(LEVEL_STARS_KEY + levelNumber, 0);
-    }
+    public int GetLevelStars(int levelNumber) { return PlayerPrefs.GetInt(LEVEL_STARS_KEY + levelNumber, 0); }
 
     /// <summary>
     /// Lưu số sao của một level (chỉ lưu nếu cao hơn record cũ)
@@ -85,7 +86,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     public void SaveLevelStars(int levelNumber, int stars)
     {
         int currentStars = GetLevelStars(levelNumber);
-        
+
         if (stars > currentStars)
         {
             PlayerPrefs.SetInt(LEVEL_STARS_KEY + levelNumber, stars);
@@ -134,10 +135,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     /// <summary>
     /// Lấy level hiện tại đang chơi
     /// </summary>
-    public int GetCurrentLevel()
-    {
-        return PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 1);
-    }
+    public int GetCurrentLevel() { return PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 1); }
 
     #endregion
 
@@ -153,6 +151,7 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
             PlayerPrefs.DeleteKey(LEVEL_UNLOCK_KEY + i);
             PlayerPrefs.DeleteKey(LEVEL_STARS_KEY + i);
         }
+
         PlayerPrefs.DeleteKey(CURRENT_LEVEL_KEY);
         PlayerPrefs.Save();
 
@@ -168,14 +167,18 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     public void LogProgress()
     {
         Debug.Log("=== LEVEL PROGRESS ===");
+
         for (int i = 1; i <= _allLevels.Length; i++)
         {
             bool unlocked = IsLevelUnlocked(i);
-            int stars = GetLevelStars(i);
+            int  stars    = GetLevelStars(i);
             Debug.Log($"Level {i}: {(unlocked ? "Unlocked" : "Locked")} - Stars: {stars}");
         }
+
         Debug.Log("=====================");
     }
 
     #endregion
+
+    private void BackButtonOnClick() { SceneManager.LoadScene("SelectAnimalScene"); }
 }

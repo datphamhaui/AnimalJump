@@ -15,8 +15,9 @@ MonoBehaviour:
   levelNumber: 5
   levelName: Level 5
   targetScore: 80
+  coinReward: 100
   platformSpeed: 3.2
-  platformGapRange: {x: 0.7, y: 1.9}
+  platformGapRange: {x: 2.7, y: 3.9}
   safeLandingZoneRatio: 0.67
   hasObstacles: 1
   speedIncreaseRate: 0.05

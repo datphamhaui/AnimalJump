@@ -13,7 +13,13 @@ public class Piece : MonoBehaviour
     [Tooltip("Tỷ lệ vùng an toàn (0-1). Có thể bị override bởi LevelManager")]
     [SerializeField] float _safeLandingZoneRatio = 0.7f;
 
+    [Header("Coin Settings")]
+    [SerializeField] private GameObject _coinObject;
+    [Tooltip("Xác suất xuất hiện coin (0-1). 0.5 = 50% chance")]
+    [SerializeField] private float _coinSpawnChance = 0.5f;
+
     private LevelManager _levelManager;
+    private Coin _coin;
 
     [Header("Visual")]
     [SerializeField] MeshRenderer _renderer;
@@ -44,6 +50,38 @@ public class Piece : MonoBehaviour
         if (_levelManager != null)
         {
             _safeLandingZoneRatio = _levelManager.GetSafeLandingZoneRatio();
+        }
+
+        // Random spawn coin
+        InitializeCoin();
+    }
+
+    /// <summary>
+    /// Random xem có spawn coin không và hiển thị/ẩn coin
+    /// </summary>
+    private void InitializeCoin()
+    {
+        if (_coinObject == null) return;
+
+        // Get Coin component
+        _coin = _coinObject.GetComponent<Coin>();
+        if (_coin == null)
+        {
+            Debug.LogWarning($"[Piece] Coin object doesn't have Coin script attached!");
+            return;
+        }
+
+        // Random spawn coin
+        float randomValue = UnityEngine.Random.Range(0f, 1f);
+        if (randomValue <= _coinSpawnChance)
+        {
+            _coin.Show();
+            Debug.Log($"[Piece {gameObject.name}] 🪙 Coin spawned! (chance: {randomValue:F2})");
+        }
+        else
+        {
+            _coin.Hide();
+            Debug.Log($"[Piece {gameObject.name}] No coin (chance: {randomValue:F2})");
         }
     }
 

@@ -15,8 +15,9 @@ MonoBehaviour:
   levelNumber: 9
   levelName: Level 9
   targetScore: 140
+  coinReward: 100
   platformSpeed: 4.4
-  platformGapRange: {x: 0.9, y: 2.3}
+  platformGapRange: {x: 2.9, y: 4.3}
   safeLandingZoneRatio: 0.59000003
   hasObstacles: 1
   speedIncreaseRate: 0.05

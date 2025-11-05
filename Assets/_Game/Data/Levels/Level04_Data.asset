@@ -15,8 +15,9 @@ MonoBehaviour:
   levelNumber: 4
   levelName: Level 4
   targetScore: 65
+  coinReward: 100
   platformSpeed: 2.9
-  platformGapRange: {x: 0.65, y: 1.8}
+  platformGapRange: {x: 2.65, y: 3.8}
   safeLandingZoneRatio: 0.69
   hasObstacles: 0
   speedIncreaseRate: 0.05

@@ -15,8 +15,9 @@ MonoBehaviour:
   levelNumber: 8
   levelName: Level 8
   targetScore: 125
+  coinReward: 100
   platformSpeed: 4.1
-  platformGapRange: {x: 0.85, y: 2.2}
+  platformGapRange: {x: 2.85, y: 4.2}
   safeLandingZoneRatio: 0.61
   hasObstacles: 1
   speedIncreaseRate: 0.05

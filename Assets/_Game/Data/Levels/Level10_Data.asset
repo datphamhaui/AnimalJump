@@ -15,8 +15,9 @@ MonoBehaviour:
   levelNumber: 10
   levelName: Level 10
   targetScore: 155
+  coinReward: 100
   platformSpeed: 4.7000003
-  platformGapRange: {x: 0.95, y: 2.4}
+  platformGapRange: {x: 2.95, y: 4.4}
   safeLandingZoneRatio: 0.57
   hasObstacles: 1
   speedIncreaseRate: 0.05
