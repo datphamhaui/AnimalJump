@@ -63,6 +63,13 @@ public class PauseMenu : Menu
     {
         if (_restartButton) _restartButton.interactable = false;
 
+        // Reset health về 3 hearts trước khi reload
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và resume time
         SetDisable();
 
@@ -79,12 +86,26 @@ public class PauseMenu : Menu
     {
         if (_homeButton) _homeButton.interactable = false;
 
-        // Đóng menu và resume time
+        // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
+        DisableAllMenus();
 
         StartCoroutine(LevelLoader.ReloadLevelAsync(() =>
         {
             SceneManager.LoadScene("Level");
         }));
+    }
+
+    /// <summary>
+    /// Disable tất cả các menus trước khi chuyển scene
+    /// </summary>
+    private void DisableAllMenus()
+    {
+        MenuManager menuManager = MenuManager.GetInstance();
+        if (menuManager != null)
+        {
+            // Clear tất cả menus trong stack
+            menuManager.ClearAllMenus();
+        }
     }
 }

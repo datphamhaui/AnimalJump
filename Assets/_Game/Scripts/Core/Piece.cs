@@ -18,8 +18,14 @@ public class Piece : MonoBehaviour
     [Tooltip("Xác suất xuất hiện coin (0-1). 0.5 = 50% chance")]
     [SerializeField] private float _coinSpawnChance = 0.5f;
 
+    [Header("Heart Settings")]
+    [SerializeField] private GameObject _heartObject;
+    [Tooltip("Xác suất xuất hiện heart (0-1). 0.3 = 30% chance")]
+    [SerializeField] private float _heartSpawnChance = 0.3f;
+
     private LevelManager _levelManager;
     private Coin _coin;
+    private Heart _heart;
 
     [Header("Visual")]
     [SerializeField] MeshRenderer _renderer;
@@ -52,36 +58,68 @@ public class Piece : MonoBehaviour
             _safeLandingZoneRatio = _levelManager.GetSafeLandingZoneRatio();
         }
 
-        // Random spawn coin
-        InitializeCoin();
+        // Random spawn pickups (chỉ spawn Heart HOẶC Coin, không cả hai)
+        InitializePickups();
     }
 
     /// <summary>
-    /// Random xem có spawn coin không và hiển thị/ẩn coin
+    /// Random spawn Heart hoặc Coin (ưu tiên Heart nếu cả hai đều trúng)
+    /// CHỈ 1 trong 2 được hiển thị, không bao giờ cả hai cùng lúc
     /// </summary>
-    private void InitializeCoin()
+    private void InitializePickups()
     {
-        if (_coinObject == null) return;
+        bool heartSpawned = false;
 
-        // Get Coin component
-        _coin = _coinObject.GetComponent<Coin>();
-        if (_coin == null)
+        // Lấy components trước
+        if (_heartObject != null)
         {
-            Debug.LogWarning($"[Piece] Coin object doesn't have Coin script attached!");
-            return;
+            _heart = _heartObject.GetComponent<Heart>();
+        }
+        
+        if (_coinObject != null)
+        {
+            _coin = _coinObject.GetComponent<Coin>();
         }
 
-        // Random spawn coin
-        float randomValue = UnityEngine.Random.Range(0f, 1f);
-        if (randomValue <= _coinSpawnChance)
+        // Try spawn Heart trước (ưu tiên cao hơn)
+        if (_heart != null)
         {
-            _coin.Show();
-            Debug.Log($"[Piece {gameObject.name}] 🪙 Coin spawned! (chance: {randomValue:F2})");
+            float randomValue = UnityEngine.Random.Range(0f, 1f);
+            if (randomValue <= _heartSpawnChance)
+            {
+                // Spawn Heart → ẨN Coin
+                _heart.Show();
+                if (_coin != null) _coin.Hide();
+                
+                heartSpawned = true;
+                Debug.Log($"[Piece {gameObject.name}] ❤️ Heart spawned! Coin hidden. (chance: {randomValue:F2})");
+                return; // Dừng luôn, không spawn coin
+            }
+            else
+            {
+                _heart.Hide();
+            }
+        }
+
+        // Chỉ đến đây nếu KHÔNG có Heart
+        // Random spawn Coin
+        if (_coin != null)
+        {
+            float randomValue = UnityEngine.Random.Range(0f, 1f);
+            if (randomValue <= _coinSpawnChance)
+            {
+                _coin.Show();
+                Debug.Log($"[Piece {gameObject.name}] 🪙 Coin spawned! (chance: {randomValue:F2})");
+            }
+            else
+            {
+                _coin.Hide();
+                Debug.Log($"[Piece {gameObject.name}] No pickup spawned");
+            }
         }
         else
         {
-            _coin.Hide();
-            Debug.Log($"[Piece {gameObject.name}] No coin (chance: {randomValue:F2})");
+            Debug.Log($"[Piece {gameObject.name}] No pickup spawned (no heart)");
         }
     }
 
@@ -104,42 +142,16 @@ public class Piece : MonoBehaviour
 
         Debug.Log($"[Piece {gameObject.name}] Distance to center: {xDistanceToCenter:F2} | Safe zone: {safeZoneWidth:F2}");
 
-        // Nếu đáp xa tâm (ngoài vùng an toàn) = đáp lệch mép
+        // Nếu đáp xa tâm (ngoài vùng an toàn) = đáp lệch mép → Mất health
         if (xDistanceToCenter > safeZoneWidth)
         {
-            _isGameOver = true;
+            Debug.Log($"[Piece {gameObject.name}] ⚠️ Landed on edge - Player loses health!");
 
-            Debug.Log($"[Piece {gameObject.name}] ❌ GAME OVER - Landed on edge!");
-
-            // QUAN TRỌNG: Tách player khỏi platform ngay lập tức
-            if (c.transform.parent != null)
-            {
-                c.transform.parent = null;
-                Debug.Log($"[Piece {gameObject.name}] ✂️ Detached player from platform");
-            }
-
-            // Bật physics và gravity để player rơi
-            PlayerMovement playerMovement = c.gameObject.GetComponent<PlayerMovement>();
-            if (playerMovement != null)
-            {
-                playerMovement.EnablePhysicsOnGameOver();
-            }
-
-            // Thêm lực xoay để player lật người
-            Rigidbody rb = c.gameObject.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                // Xác định hướng xoay dựa trên vị trí đáp (trái hay phải)
-                float torquePower = (c.transform.position.x > transform.position.x) ? -15f : 15f;
-                rb.AddTorque(Vector3.forward * torquePower, ForceMode.Impulse);
-                
-                // Thêm lực đẩy xuống để rơi nhanh hơn
-                rb.AddForce(Vector3.down * 2f, ForceMode.Impulse);
-                
-                Debug.Log($"[Piece {gameObject.name}] 💥 Applied torque: {torquePower} and downward force");
-            }
-
+            // Trigger event để GameManager xử lý (mất health)
             OnGameOver?.Invoke();
+
+            // CHỈ rơi nếu hết health (GameManager sẽ xử lý việc này)
+            // Không detach/rơi ngay ở đây nữa
         }
         else
         {

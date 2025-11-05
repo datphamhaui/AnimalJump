@@ -230,8 +230,9 @@ public class WinMenu : Menu
     {
         SetButtonInteractable(_closeButton, false);
         
-        // Đóng menu trước
+        // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
+        DisableAllMenus();
         
         // Về scene chọn level
         StartCoroutine(LevelLoader.ReloadLevelAsync(() =>
@@ -247,8 +248,9 @@ public class WinMenu : Menu
     {
         SetButtonInteractable(_homeButton, false);
         
-        // Đóng menu trước
+        // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
+        DisableAllMenus();
 
         StartCoroutine(LevelLoader.ReloadLevelAsync(() =>
         {
@@ -257,11 +259,31 @@ public class WinMenu : Menu
     }
 
     /// <summary>
+    /// Disable tất cả các menus trước khi chuyển scene
+    /// </summary>
+    private void DisableAllMenus()
+    {
+        MenuManager menuManager = MenuManager.GetInstance();
+        if (menuManager != null)
+        {
+            // Clear tất cả menus trong stack
+            menuManager.ClearAllMenus();
+        }
+    }
+
+    /// <summary>
     /// Chơi lại level hiện tại (Retry button - Blue)
     /// </summary>
     private void RetryButton()
     {
         SetButtonInteractable(_retryButton, false);
+        
+        // Reset health về 3 hearts trước khi reload
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
         
         // Đóng menu trước
         SetDisable();

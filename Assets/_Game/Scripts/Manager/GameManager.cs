@@ -13,13 +13,11 @@ public class GameManager : MonoBehaviour
     bool  _isRevive   = false;
     bool  _isGameWon  = false;
 
-    // Tracking cho star calculation
-    int _missCount = 0; // Số lần trượt (đáp lệch mép)
-
     MenuManager  _menuController;
     ScoreManager _scoreManager;
     LevelManager _levelManager;
     LevelProgressManager _levelProgressManager;
+    HealthManager _healthManager;
 
     public static event Action      OnGameEnd;
     public static event Action      OnRevive;
@@ -42,13 +40,14 @@ public class GameManager : MonoBehaviour
             Debug.LogError("[GameManager] LevelManager not found! Please add LevelManager component.");
         }
 
-        // Lấy LevelProgressManager
+        // Lấy các managers
         _levelProgressManager = LevelProgressManager.GetInstance();
+        _healthManager = HealthManager.GetInstance();
     }
 
     private void OnEnable()
     {
-        Piece.OnGameOver      += HandleMiss; // Thay đổi: track miss thay vì game end ngay
+        Piece.OnGameOver      += HandleMiss; // Đáp lệch mép → mất health
         Piece.OnLastPieceExit += UpdateLastPos;
         Piece.OnGettingScore  += SetScore;
 
@@ -72,14 +71,33 @@ public class GameManager : MonoBehaviour
 
     /// <summary>
     /// Xử lý khi player đáp lệch mép (miss)
+    /// Mất 1 heart, nếu hết heart → Game Over
     /// </summary>
     private void HandleMiss()
     {
-        _missCount++;
-        Debug.Log($"[GameManager] ⚠️ Miss count: {_missCount}");
+        if (_healthManager == null) 
+        {
+            Debug.LogError("[GameManager] HealthManager not found!");
+            GameEnd(); // Fallback: game over nếu không có health system
+            return;
+        }
 
-        // Vẫn trigger game end như cũ
-        GameEnd();
+        // Mất 1 heart
+        bool stillAlive = _healthManager.LoseHealth(1);
+
+        if (!stillAlive)
+        {
+            // Hết health → Game Over
+            Debug.Log($"[GameManager] ☠️ No more hearts! Game Over!");
+            GameEnd();
+        }
+        else
+        {
+            // Còn health → Tiếp tục chơi
+            Debug.Log($"[GameManager] 💔 Lost 1 heart! Remaining: {_healthManager.CurrentHealth}/{_healthManager.MaxHealth}");
+            
+            // TODO: Có thể thêm visual feedback (shake camera, flash screen red, etc.)
+        }
     }
 
     /// <summary>
@@ -163,16 +181,16 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Tính số sao dựa trên số lần miss
-    /// - 0 miss = 3 sao
-    /// - 1 miss = 2 sao
-    /// - 2+ miss = 1 sao
+    /// Tính số sao dựa trên số heart đã dùng
+    /// - 0 heart used = 3 sao (perfect)
+    /// - 1 heart used = 2 sao
+    /// - 2+ hearts used = 1 sao
     /// </summary>
     private int CalculateStars()
     {
-        if (_missCount == 0) return 3;
-        if (_missCount == 1) return 2;
-        return 1;
+        if (_healthManager == null) return 1;
+        
+        return _healthManager.CalculateStars();
     }
 
     public void Revive()
@@ -198,8 +216,13 @@ public class GameManager : MonoBehaviour
         _isGameOver = false;
         _isGameWon = false;
         _isRevive = false;
-        _missCount = 0;
         _lastZpos = 0;
+        
+        // Reset health về 3 hearts
+        if (_healthManager != null)
+        {
+            _healthManager.ResetHealth();
+        }
     }
 
     private void UpdateLastPos(Vector3 lastPos) { _lastZpos = lastPos.z; }

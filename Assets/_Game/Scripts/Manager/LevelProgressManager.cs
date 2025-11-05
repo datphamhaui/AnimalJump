@@ -13,8 +13,6 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     [Tooltip("Danh sách tất cả các level trong game (theo thứ tự)")]
     [SerializeField] private LevelDataSO[] _allLevels;
 
-    [SerializeField] private Button _backButton;
-
     private const string LEVEL_UNLOCK_KEY  = "LevelUnlock_";
     private const string LEVEL_STARS_KEY   = "LevelStars_";
     private const string CURRENT_LEVEL_KEY = "CurrentLevel";
@@ -30,8 +28,6 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
         {
             UnlockLevel(1);
         }
-
-        _backButton.onClick.AddListener(this.BackButtonOnClick);
     }
 
     #region Level Access
@@ -179,6 +175,4 @@ public class LevelProgressManager : Singleton<LevelProgressManager>
     }
 
     #endregion
-
-    private void BackButtonOnClick() { SceneManager.LoadScene("SelectAnimalScene"); }
 }

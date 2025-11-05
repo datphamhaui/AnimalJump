@@ -5494,6 +5494,7 @@ GameObject:
   - component: {fileID: 524426096}
   - component: {fileID: 524426095}
   - component: {fileID: 524426098}
+  - component: {fileID: 524426099}
   m_Layer: 0
   m_Name: Back - Button
   m_TagString: Untagged
@@ -5517,11 +5518,11 @@ RectTransform:
   - {fileID: 1243042411}
   m_Father: {fileID: 149489544622635885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 91, y: 72}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 84, y: -100}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 1}
 --- !u!222 &524426093
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5610,6 +5611,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _audioType: 3
   _playSound: 1
+--- !u!114 &524426099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524426091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 342df3fdda02140f1a4b0d2b102d0239, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneNameText: SelectAnimalScene
 --- !u!1 &532939241
 GameObject:
   m_ObjectHideFlags: 0
@@ -11984,7 +11998,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -84, y: -121}
+  m_AnchoredPosition: {x: -84, y: -100}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1215797701
@@ -18215,7 +18229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1726840565
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22127,7 +22141,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6b06532b7c5694d188a13657bf90d43e, type: 2}
   - {fileID: 11400000, guid: 2f70a36877da04d87bc4dfb61af14280, type: 2}
   - {fileID: 11400000, guid: 44bc7657406c54fffbcae4119d6a768e, type: 2}
-  _backButton: {fileID: 524426096}
 --- !u!4 &2083954413
 Transform:
   m_ObjectHideFlags: 0

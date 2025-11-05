@@ -66,6 +66,24 @@ public class MenuManager : Singleton<MenuManager>
             _currentMenu = _menuStack.Peek().Type;
     }
 
+    /// <summary>
+    /// Clear tất cả menus trong stack và disable tất cả
+    /// </summary>
+    public void ClearAllMenus()
+    {
+        // Disable tất cả menus trong stack
+        while (_menuStack.Count > 0)
+        {
+            Menu menu = _menuStack.Pop();
+            menu.SetDisable();
+        }
+
+        // Reset current menu
+        _currentMenu = MenuType.None;
+
+        Debug.Log("[MenuManager] All menus cleared");
+    }
+
     #endregion
 
     #region Private Functions
