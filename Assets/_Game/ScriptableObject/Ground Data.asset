@@ -13,15 +13,5 @@ MonoBehaviour:
   m_Name: Ground Data
   m_EditorClassIdentifier: 
   _platMats:
-  - {fileID: 2100000, guid: f494125473ec34542a93aeade9969188, type: 2}
-  - {fileID: 2100000, guid: a3bb7097b9e13f648880dab68a1f7303, type: 2}
-  - {fileID: 2100000, guid: 908884d793362584d8dad2176d0f6f2f, type: 2}
-  - {fileID: 2100000, guid: 6438769b0b514684e80ecaf835a62eb8, type: 2}
-  - {fileID: 2100000, guid: 9e19cdc04af4868438961db275b94322, type: 2}
-  - {fileID: 2100000, guid: 020f61e618619a9478a1f3b923f351a6, type: 2}
-  - {fileID: 2100000, guid: f1e2f8dc5e544454f8c1d3385f5ad369, type: 2}
-  - {fileID: 2100000, guid: 92a84ff78686246a8949854837d4d0e2, type: 2}
-  - {fileID: 2100000, guid: f179fad34041e3c459a655af32ccf823, type: 2}
-  - {fileID: 2100000, guid: c0115437ad598dc418b1e4c65162f0ae, type: 2}
-  - {fileID: 2100000, guid: 9094b0986428721468488742dc298b44, type: 2}
+  - {fileID: 2100000, guid: 6751ce1a4611b3940812c13a6847d94f, type: 2}
   <GetFloatingScore>k__BackingField: {fileID: 8045562706838802029, guid: f317b17326d27ab4c91badaa52804aed, type: 3}

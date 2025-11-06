@@ -76,7 +76,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7459769bbdb8ae742a8080430d6e75d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomSpeed: {x: 1, y: 3}
   _gap: {x: 3, y: 6}
   _seedSize: 10
   _container: {fileID: 4924895719881056351}
@@ -84,4 +83,3 @@ MonoBehaviour:
   - {fileID: 1246828001613476779, guid: aefa582c1d087874eb91715749f49c8d, type: 3}
   - {fileID: 1246828001613476779, guid: 0e9da6cdedc5dcf4eb01970ac4382458, type: 3}
   - {fileID: 1246828001613476779, guid: 4c0c4fe6801490347906db50821c27c4, type: 3}
-  - {fileID: 1246828001613476779, guid: 1d43c3388d7bb154fae3c09a92fa1081, type: 3}
