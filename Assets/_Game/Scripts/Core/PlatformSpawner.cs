@@ -16,14 +16,23 @@ public class PlatformSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] private Platform _platformPrefab;
     [SerializeField] private Transform _target; // Player transform
+    [SerializeField] private Piece[] _pieces;
 
     private bool _invertPlatform;
     private Vector3 _lastPlatformPosition;
     private int _platformCount = 0;
+    private Piece _selectedPiece; // Piece được chọn 1 lần duy nhất cho tất cả platform
 
     private void Start()
     {
         _lastPlatformPosition = Vector3.forward * _gap;
+
+        // Random chọn 1 piece duy nhất cho tất cả platform
+        if (_pieces != null && _pieces.Length > 0)
+        {
+            _selectedPiece = _pieces[Random.Range(0, _pieces.Length)];
+            Debug.Log($"[PlatformSpawner] Selected piece: {_selectedPiece.name}");
+        }
     }
 
     private void Update()
@@ -52,6 +61,9 @@ public class PlatformSpawner : MonoBehaviour
         Platform newPlatform = Instantiate(prefab, transform);
         newPlatform.transform.position = position;
 
+        // Dùng piece đã được chọn sẵn
+        newPlatform.SetPiece(_selectedPiece);
+
         // Đảo ngược platform (luân phiên trái/phải)
         newPlatform.InvertPos = _invertPlatform;
         newPlatform.gameObject.SetActive(true);
@@ -75,6 +87,13 @@ public class PlatformSpawner : MonoBehaviour
         _platformCount = 0;
         _lastPlatformPosition = Vector3.forward * _gap;
         _invertPlatform = false;
+
+        // Random chọn piece mới khi reset
+        if (_pieces != null && _pieces.Length > 0)
+        {
+            _selectedPiece = _pieces[Random.Range(0, _pieces.Length)];
+            Debug.Log($"[PlatformSpawner] Reset - Selected new piece: {_selectedPiece.name}");
+        }
 
         // Xóa tất cả platform đã spawn
         foreach (Transform child in transform)

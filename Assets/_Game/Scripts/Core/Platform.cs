@@ -9,10 +9,7 @@ public class Platform : MonoBehaviour
     [SerializeField] int _seedSize = 10;
     [SerializeField] Transform _container;
 
-    [Space]
-    [SerializeField] Piece[] _pieces;
-
-    int[] seed;
+    Piece _piece;
 
     float _pieceSpeed;
     float newXPos = 0f;
@@ -21,6 +18,14 @@ public class Platform : MonoBehaviour
 
     bool _isInverted = false;
     public bool InvertPos { set { _isInverted = value; } }
+
+    /// <summary>
+    /// Set piece cho platform (được gọi từ PlatformSpawner)
+    /// </summary>
+    public void SetPiece(Piece piece)
+    {
+        _piece = piece;
+    }
 
     List<Piece> _pieceList = new List<Piece>();
 
@@ -53,8 +58,10 @@ public class Platform : MonoBehaviour
             Debug.LogWarning("LevelManager not found! Using default speed.");
         }
 
-        GenerateSeed();
-        GeneratePiece();
+        if (_piece != null)
+        {
+            GeneratePiece();
+        }
     }
 
     /// <summary>
@@ -66,27 +73,16 @@ public class Platform : MonoBehaviour
         Debug.Log($"Platform speed updated to: {_pieceSpeed} (Level {level})");
     }
 
-    void GenerateSeed()
-    {
-        seed = new int[_seedSize];
-
-        for (int i = 0; i < seed.Length; i++)
-        {
-            seed[i] = Random.Range(0, _pieces.Length);
-        }
-    }
-
     void GeneratePiece()
     {
-        for (int i = 0; i < seed.Length; i++)
+        for (int i = 0; i < _seedSize; i++)
         {
-            Piece newPiece = Instantiate(_pieces[seed[i]], _container);
+            Piece newPiece = Instantiate(_piece, _container);
             newPiece.transform.localPosition += Vector3.right * newXPos;
             _pieceList.Add(newPiece);
 
-            int nextIndex = (i + 1) % seed.Length;
             float gap = Random.Range(_gap.x, _gap.y);
-            newXPos += _pieces[seed[i]].HalfWidth + _pieces[seed[nextIndex]].HalfWidth + gap;
+            newXPos += _piece.HalfWidth + _piece.HalfWidth + gap;
         }
 
         _resetPos = newXPos;
