@@ -3,7 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// Quản lý health/heart của player
-/// Max 3 hearts, mất heart khi đáp lệch mép
+/// Max 3 hearts, chỉ mất heart khi đạp vào TRAPS (bẫy)
+/// LÀM RÕ: Đáp lệch mép và boundary wall = Game Over trực tiếp (không liên quan health)
 /// </summary>
 public class HealthManager : Singleton<HealthManager>
 {
@@ -62,7 +63,7 @@ public class HealthManager : Singleton<HealthManager>
     }
 
     /// <summary>
-    /// Mất health (khi đáp lệch mép)
+    /// Mất health (khi đạp vào TRAP/bẫy)
     /// </summary>
     /// <returns>True nếu player còn sống, False nếu đã hết health</returns>
     public bool LoseHealth(int amount)
@@ -97,12 +98,25 @@ public class HealthManager : Singleton<HealthManager>
         
         OnHealthChanged?.Invoke(_currentHealth);
     }
+    
+    public void SetHealthToZero()
+    {
+        int lostAmount = _currentHealth;
+        _currentHealth =  0;
+        _healthUsed    += lostAmount;
+
+        Debug.Log($"[HealthManager] ☠️ Health set to 0! Total hearts used: {_healthUsed}");
+
+        OnHealthLost?.Invoke();
+        OnHealthChanged?.Invoke(_currentHealth);
+        OnPlayerDied?.Invoke();
+    }
 
     /// <summary>
-    /// Tính số sao dựa trên số heart đã dùng
-    /// - 0 heart used = 3 sao (perfect)
-    /// - 1 heart used = 2 sao
-    /// - 2+ hearts used = 1 sao
+    /// Tính số sao dựa trên số heart đã dùng (từ traps)
+    /// - 0 heart used (không đạp trap nào) = 3 sao (perfect)
+    /// - 1 heart used (đạp 1 trap) = 2 sao
+    /// - 2+ hearts used (đạp 2+ traps) = 1 sao
     /// </summary>
     public int CalculateStars()
     {

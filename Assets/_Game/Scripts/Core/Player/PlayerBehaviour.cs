@@ -52,7 +52,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (arrayIndex >= 0 && arrayIndex < _animalModelPrefabs.Length && _animalModelPrefabs[arrayIndex] != null)
         {
-            _spawnedModel = Instantiate(_animalModelPrefabs[arrayIndex], transform);
+            _spawnedModel                         = Instantiate(_animalModelPrefabs[arrayIndex], transform);
             _spawnedModel.transform.localPosition = Vector3.zero;
             _spawnedModel.transform.localRotation = Quaternion.identity;
 
@@ -98,6 +98,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (_isPlayerDeath || !_playerCollision.CanJump)
         {
             Debug.Log("[Player] Cannot jump - Death or already jumping");
+
             return;
         }
 
@@ -126,6 +127,11 @@ public class PlayerBehaviour : MonoBehaviour
         _isPlayerDeath = true;
 
         // Bật physics để player rơi xuống
+        if (_playerMovement == null)
+        {
+            _playerMovement = GetComponent<PlayerMovement>();
+        }
+
         _playerMovement.EnablePhysicsOnGameOver();
 
         // Dừng animation hoặc chuyển sang animation chết

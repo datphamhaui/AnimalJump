@@ -205,6 +205,10 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void EnablePhysicsOnGameOver()
     {
+        if(this._rb == null)
+        {
+            _rb = this.GetComponent<Rigidbody>();
+        }
         // _isGameOver = true;
         _isJumping = false;
         

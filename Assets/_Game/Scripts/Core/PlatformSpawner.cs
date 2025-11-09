@@ -1,3 +1,4 @@
+using _Game.Scripts.Core;
 using UnityEngine;
 
 /// <summary>
@@ -15,13 +16,16 @@ public class PlatformSpawner : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Platform _platformPrefab;
-    [SerializeField] private Transform _target; // Player transform
-    [SerializeField] private Piece[] _pieces;
 
-    private bool _invertPlatform;
+    [SerializeField] private Transform     _target; // Player transform
+    [SerializeField] private Piece[]       _pieces;
+    [SerializeField] private BaseManager  _baseManager;
+
+    private bool    _invertPlatform;
     private Vector3 _lastPlatformPosition;
-    private int _platformCount = 0;
-    private Piece _selectedPiece; // Piece được chọn 1 lần duy nhất cho tất cả platform
+    private int     _platformCount = 0;
+    private Piece   _selectedPiece; // Piece được chọn 1 lần duy nhất cho tất cả platform
+    private int     _seclectedPieceIndex = 0;
 
     private void Start()
     {
@@ -30,7 +34,9 @@ public class PlatformSpawner : MonoBehaviour
         // Random chọn 1 piece duy nhất cho tất cả platform
         if (_pieces != null && _pieces.Length > 0)
         {
-            _selectedPiece = _pieces[Random.Range(0, _pieces.Length)];
+            _seclectedPieceIndex = Random.Range(0, _pieces.Length);
+            _selectedPiece       = _pieces[_seclectedPieceIndex];
+            _baseManager.InitializeBasePieces(this._seclectedPieceIndex);
             Debug.Log($"[PlatformSpawner] Selected piece: {_selectedPiece.name}");
         }
     }
@@ -44,7 +50,7 @@ public class PlatformSpawner : MonoBehaviour
         }
 
         // Kiểm tra nếu player gần đến platform cuối thì spawn platform mới
-        float sqrDistance = Vector3.SqrMagnitude(_lastPlatformPosition - _target.position);
+        float sqrDistance  = Vector3.SqrMagnitude(_lastPlatformPosition - _target.position);
         float sqrThreshold = _gapFromLastPlatformToTarget * _gapFromLastPlatformToTarget;
 
         if (sqrDistance < sqrThreshold)
@@ -84,9 +90,9 @@ public class PlatformSpawner : MonoBehaviour
     /// </summary>
     public void ResetSpawner()
     {
-        _platformCount = 0;
+        _platformCount        = 0;
         _lastPlatformPosition = Vector3.forward * _gap;
-        _invertPlatform = false;
+        _invertPlatform       = false;
 
         // Random chọn piece mới khi reset
         if (_pieces != null && _pieces.Length > 0)

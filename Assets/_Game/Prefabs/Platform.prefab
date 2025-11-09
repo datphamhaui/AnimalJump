@@ -79,7 +79,6 @@ MonoBehaviour:
   _gap: {x: 3, y: 6}
   _seedSize: 10
   _container: {fileID: 4924895719881056351}
-  _pieces:
-  - {fileID: 1246828001613476779, guid: aefa582c1d087874eb91715749f49c8d, type: 3}
-  - {fileID: 1246828001613476779, guid: 0e9da6cdedc5dcf4eb01970ac4382458, type: 3}
-  - {fileID: 1246828001613476779, guid: 4c0c4fe6801490347906db50821c27c4, type: 3}
+  _initialPieceScaleX: 2.5
+  _scaleDecreaseRate: 0.1
+  _minPieceScale: 1

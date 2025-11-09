@@ -14,6 +14,9 @@ public class Piece : MonoBehaviour
     [Tooltip("Tỷ lệ vùng an toàn (0-1). Có thể bị override bởi LevelManager")]
     [SerializeField] float _safeLandingZoneRatio = 0.7f;
 
+    [Header("Cube ")]
+    [SerializeField] public GameObject _cubeObject;
+
     [Header("Coin Settings")]
     [SerializeField] private GameObject _coinObject;
 
@@ -26,10 +29,23 @@ public class Piece : MonoBehaviour
     [Tooltip("Xác suất xuất hiện heart (0-1). 0.15 = 15% chance")]
     [SerializeField] private float _heartSpawnChance = 0.15f;
 
+    [Header("Trap Settings")]
+    [SerializeField] private GameObject _trapObject;
+
+    [Tooltip("Xác suất xuất hiện trap/bẫy (0-1). 0.1 = 10% chance")]
+    [SerializeField] private float _trapSpawnChance = 0.1f;
+
     public  bool         isIgnoreTriggerSetScore = false;
     private LevelManager _levelManager;
     private Coin         _coin;
     private Heart        _heart;
+    private Trap         _trap;
+
+    // Lưu original scales của pickup objects
+    private Vector3 _originalCoinScale;
+    private Vector3 _originalHeartScale;
+    private Vector3 _originalTrapScale;
+    private bool    _originalScalesSaved = false;
 
     [Header("Visual")]
     [SerializeField] MeshRenderer _renderer;
@@ -82,38 +98,66 @@ public class Piece : MonoBehaviour
     }
 
     /// <summary>
-    /// Random spawn Heart hoặc Coin (ưu tiên Heart nếu cả hai đều trúng)
-    /// CHỈ 1 trong 2 được hiển thị, không bao giờ cả hai cùng lúc
+    /// Random spawn Heart, Trap hoặc Coin
+    /// Priority: Heart > Trap > Coin (CHỈ 1 trong 3 được spawn)
     /// </summary>
     private void InitializePickups()
     {
-        bool heartSpawned = false;
-
-        // Lấy components trước
-        if (_heartObject != null)
+        // Lấy components và lưu original scales trước (chỉ lần đầu)
+        if (!_originalScalesSaved)
         {
-            _heart = _heartObject.GetComponent<Heart>();
+            if (_heartObject != null)
+            {
+                _heart              = _heartObject.GetComponent<Heart>();
+                _originalHeartScale = _heartObject.transform.localScale;
+            }
+
+            if (_trapObject != null)
+            {
+                _trap              = _trapObject.GetComponent<Trap>();
+                _originalTrapScale = _trapObject.transform.localScale;
+            }
+
+            if (_coinObject != null)
+            {
+                _coin              = _coinObject.GetComponent<Coin>();
+                _originalCoinScale = _coinObject.transform.localScale;
+            }
+
+            _originalScalesSaved = true;
+        }
+        else
+        {
+            // Nếu đã lưu scales rồi, chỉ lấy components
+            if (_heartObject != null && _heart == null)
+            {
+                _heart = _heartObject.GetComponent<Heart>();
+            }
+
+            if (_trapObject != null && _trap == null)
+            {
+                _trap = _trapObject.GetComponent<Trap>();
+            }
+
+            if (_coinObject != null && _coin == null)
+            {
+                _coin = _coinObject.GetComponent<Coin>();
+            }
         }
 
-        if (_coinObject != null)
-        {
-            _coin = _coinObject.GetComponent<Coin>();
-        }
-
-        // Try spawn Heart trước (ưu tiên cao hơn)
+        // 1. Try spawn Heart trước (priority cao nhất)
         if (_heart != null)
         {
             float randomValue = UnityEngine.Random.Range(0f, 1f);
 
             if (randomValue <= _heartSpawnChance)
             {
-                // Spawn Heart → ẨN Coin
+                // Spawn Heart → Ẩn Trap và Coin
                 _heart.Show();
+                if (_trap != null) _trap.Hide();
                 if (_coin != null) _coin.Hide();
 
-                heartSpawned = true;
-
-                return; // Dừng luôn, không spawn coin
+                return; // Dừng luôn
             }
             else
             {
@@ -121,8 +165,28 @@ public class Piece : MonoBehaviour
             }
         }
 
-        // Chỉ đến đây nếu KHÔNG có Heart
-        // Random spawn Coin
+        // 2. Chỉ đến đây nếu KHÔNG spawn Heart
+        // Try spawn Trap (priority trung bình)
+        if (_trap != null)
+        {
+            float randomValue = UnityEngine.Random.Range(0f, 1f);
+
+            if (randomValue <= _trapSpawnChance)
+            {
+                // Spawn Trap → Ẩn Coin
+                _trap.Show();
+                if (_coin != null) _coin.Hide();
+
+                return; // Dừng luôn
+            }
+            else
+            {
+                _trap.Hide();
+            }
+        }
+
+        // 3. Chỉ đến đây nếu KHÔNG có Heart và KHÔNG có Trap
+        // Random spawn Coin (priority thấp nhất)
         if (_coin != null)
         {
             float randomValue = UnityEngine.Random.Range(0f, 1f);
@@ -139,6 +203,32 @@ public class Piece : MonoBehaviour
     }
 
     private void Revive() { _isGameOver = false; }
+
+    /// <summary>
+    /// Điều chỉnh scale của pickup objects để chúng scale đều theo tỷ lệ với piece
+    /// Pickup objects sẽ scale đều theo tất cả các chiều (X, Y, Z) theo tỷ lệ piece scale
+    /// Được gọi từ Platform sau khi piece được scale
+    /// </summary>
+    public void AdjustPickupScales(float pieceScaleX)
+    {
+        // Scale pickup objects đều theo tất cả các chiều với tỷ lệ piece scale
+        if (_coinObject != null)
+        {
+            _coinObject.transform.localScale = Vector3.one * pieceScaleX;
+        }
+
+        if (_heartObject != null)
+        {
+            _heartObject.transform.localScale = Vector3.one * pieceScaleX;
+        }
+
+        if (_trapObject != null)
+        {
+            _trapObject.transform.localScale = Vector3.one * pieceScaleX;
+        }
+
+        Debug.Log($"[Piece] Scaled pickup objects uniformly by {pieceScaleX:F2} (Original * {pieceScaleX:F2})");
+    }
 
     /// <summary>
     /// Stop platform fall coroutine khi freeze (revive system)
@@ -181,10 +271,10 @@ public class Piece : MonoBehaviour
         }
 
         // Tính khoảng cách từ player đến tâm của piece
-        float xDistanceToCenter = Mathf.Abs(c.transform.position.x - transform.position.x);
+        float xDistanceToCenter = Mathf.Abs(c.transform.position.x - col.bounds.center.x);
 
         // Tính vùng an toàn (giữa piece)
-        float safeZoneWidth = col.bounds.size.x * _safeLandingZoneRatio * 0.5f;
+        float safeZoneWidth = col.bounds.size.x * 0.5f;
 
         // Nếu đáp xa tâm (ngoài vùng an toàn) = đáp lệch mép → Mất health
         if (xDistanceToCenter > safeZoneWidth)

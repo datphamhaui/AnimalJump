@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   levelNumber: 8
   levelName: Level 8
-  targetScore: 125
+  targetScore: 190
   coinReward: 100
   platformSpeed: 4.1
-  platformGapRange: {x: 2.85, y: 4.2}
+  platformGapRange: {x: 4, y: 7}
   safeLandingZoneRatio: 0.9
   hasObstacles: 1
   speedIncreaseRate: 0.05

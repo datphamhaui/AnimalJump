@@ -494,6 +494,7 @@ MonoBehaviour:
   _landing: {fileID: 8300000, guid: 5e1fe137dc6a150468d78cd2173e3aff, type: 3}
   _gameover: {fileID: 8300000, guid: 7b6482aafee92d245b5a51b050c5aa94, type: 3}
   _buttonClick: {fileID: 8300000, guid: 9cb19eb032d304b07acec596ae2ce4a4, type: 3}
+  _gameWin: {fileID: 8300000, guid: 9d12098ed55364e7e80e277242e2c77e, type: 3}
   _fadeDuration: 1
 --- !u!4 &304746320
 Transform:

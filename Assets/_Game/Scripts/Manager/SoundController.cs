@@ -6,7 +6,8 @@ public enum AudioType
     JUMP,
     LANDING,
     GAMEOVER,
-    BUTTON_CLICK
+    BUTTON_CLICK,
+    GAME_WIN,
 }
 
 public enum MusicType
@@ -34,6 +35,7 @@ public class SoundController : Singleton<SoundController>
     [SerializeField] AudioClip _landing;
     [SerializeField] AudioClip _gameover;
     [SerializeField] AudioClip _buttonClick;
+    [SerializeField] AudioClip _gameWin;
 
     [Header("Fade Settings")]
     [SerializeField] float _fadeDuration = 1f;
@@ -211,6 +213,9 @@ public class SoundController : Singleton<SoundController>
                 return _gameover;
             case AudioType.BUTTON_CLICK:
                 return _buttonClick;
+            case AudioType.GAME_WIN:
+                return _gameWin;
+            
             default:
                 return null;
         }

@@ -1,4 +1,5 @@
 using System;
+using _Game.Scripts.Core;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -49,12 +50,13 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Piece.OnGameOver      += HandleMiss; // Đáp lệch mép → mất health
+        Piece.OnGameOver      += HandleMiss; // Đáp lệch mép → game over trực tiếp
         Piece.OnLastPieceExit += UpdateLastPos;
         Piece.OnGettingScore  += SetScore;
         Piece.OnSafeLanding   += SetCheckpoint; // Set checkpoint khi player landed safe
 
-        BoundaryWall.OnBoundaryHit += HandleBoundaryCollision; // Player chạm boundary wall
+        BoundaryWall.OnBoundaryHit += HandleBoundaryCollision; // Player chạm boundary wall → game over trực tiếp
+        FallDetector.OnPlayerFell += HandleMiss; // Player rơi xuống → game over trực tiếp
 
         PlayerBehaviour.OnPlayerDeath += GameEnd;
         PlayerBehaviour.OnFirstJump   += StartGameplay;
@@ -76,74 +78,56 @@ public class GameManager : MonoBehaviour
 
     /// <summary>
     /// Xử lý khi player đáp lệch mép (miss)
-    /// Freeze platforms → Mất 1 heart → Revive về checkpoint hoặc Game Over
+    /// → Game Over TRỰC TIẾP (không trừ health, không revive)
     /// </summary>
     private void HandleMiss()
     {
-        if (_healthManager == null)
-        {
-            Debug.LogError("[GameManager] HealthManager not found!");
-            GameEnd(); // Fallback: game over nếu không có health system
-            return;
-        }
-
-        // Freeze platforms NGAY
-        OnPlatformFreeze?.Invoke();
-        Debug.Log("[GameManager] 🧊 Platforms FROZEN");
-
-        // Mất 1 heart
-        bool stillAlive = _healthManager.LoseHealth(1);
-
-        if (!stillAlive)
-        {
-            // Hết health → Game Over
-            Debug.Log($"[GameManager] ☠️ No more hearts! Game Over!");
-            GameEnd();
-        }
-        else
-        {
-            // Còn health → Revive về checkpoint
-            Debug.Log($"[GameManager] 💔 Lost 1 heart! Remaining: {_healthManager.CurrentHealth}/{_healthManager.MaxHealth}");
-            ReviveToCheckpoint();
-        }
+        Debug.Log("[GameManager] ☠️ Missed safe zone! Game Over!");
+        GameEnd();
     }
 
     /// <summary>
     /// Xử lý khi player chạm boundary wall (ra khỏi view)
-    /// Freeze platforms → Mất 1 heart → Revive về center piece của platform hiện tại
+    /// → Game Over TRỰC TIẾP (không trừ health, không revive)
     /// </summary>
     private void HandleBoundaryCollision(Transform platform)
     {
+        Debug.Log("[GameManager] ☠️ Hit boundary wall! Game Over!");
+        GameEnd();
+    }
+
+    /// <summary>
+    /// Xử lý khi player đạp vào bẫy (trap)
+    /// Trừ 1 heart → Nếu hết heart thì Game Over
+    /// Dùng cho các traps sẽ implement sau
+    /// </summary>
+    public void HandleTrapDamage()
+    {
         if (_healthManager == null)
         {
-            Debug.LogError("[GameManager] HealthManager not found!");
-            GameEnd();
+            Debug.LogWarning("[GameManager] HealthManager not found! Skipping trap damage.");
             return;
         }
 
-        // Freeze platforms NGAY
-        OnPlatformFreeze?.Invoke();
-        Debug.Log("[GameManager] 🧊 Platforms FROZEN (Boundary hit)");
-
-        // Mất 1 heart
+        // Trừ 1 heart
         bool stillAlive = _healthManager.LoseHealth(1);
 
         if (!stillAlive)
         {
             // Hết health → Game Over
-            Debug.Log($"[GameManager] ☠️ No more hearts! Game Over!");
+            Debug.Log($"[GameManager] ☠️ No more hearts from traps! Game Over!");
             GameEnd();
         }
         else
         {
-            // Còn health → Revive về center piece của platform
-            Debug.Log($"[GameManager] 💔 Lost 1 heart (Boundary)! Remaining: {_healthManager.CurrentHealth}/{_healthManager.MaxHealth}");
-            ReviveToCenterPiece(platform);
+            Debug.Log($"[GameManager] 💔 Hit trap! Lost 1 heart. Remaining: {_healthManager.CurrentHealth}/{_healthManager.MaxHealth}");
+            // Player tiếp tục chơi (không revive, chỉ mất health)
         }
     }
 
     /// <summary>
-    /// Revive player về center piece của platform (khi chạm boundary wall)
+    /// [DEPRECATED] Revive player về center piece của platform (khi chạm boundary wall)
+    /// Không còn dùng - giữ lại cho reference
     /// </summary>
     private void ReviveToCenterPiece(Transform platform)
     {
@@ -209,7 +193,8 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Revive player về checkpoint
+    /// [DEPRECATED] Revive player về checkpoint
+    /// Không còn dùng - giữ lại cho reference
     /// </summary>
     private void ReviveToCheckpoint()
     {
@@ -280,9 +265,13 @@ public class GameManager : MonoBehaviour
     {
         if (_isGameOver || _isGameWon) return;
         _isGameOver = true;
-
+        HealthManager.GetInstance()?.SetHealthToZero(); // Reset health để tránh mất heart khi restart
         OnGameEnd?.Invoke();
 
+        if (this._player == null)
+        {
+            this._player = FindFirstObjectByType<PlayerBehaviour>();
+        }
         _player.GameOver();
 
         // Show Lose menu instead of Revive menu
@@ -325,7 +314,7 @@ public class GameManager : MonoBehaviour
         // Hiện Win menu
         _menuController.SwitchMenu(MenuType.Win);
 
-        SoundController.GetInstance().PlayAudio(AudioType.GAMEOVER); // TODO: Thay bằng WIN sound
+        SoundController.GetInstance().PlayAudio(AudioType.GAME_WIN); // TODO: Thay bằng WIN sound
     }
 
     /// <summary>
