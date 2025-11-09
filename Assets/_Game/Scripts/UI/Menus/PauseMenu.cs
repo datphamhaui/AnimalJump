@@ -86,6 +86,13 @@ public class PauseMenu : Menu
     {
         if (_homeButton) _homeButton.interactable = false;
 
+        // Reset health về 3 hearts trước khi về Level scene
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
         DisableAllMenus();

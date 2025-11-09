@@ -51,16 +51,7 @@ public class PlayerMovement : MonoBehaviour
             new Keyframe(1f, 0f)     // Kết thúc: Y=0 (đáp xuống platform)
         );
 
-        Debug.Log("[PlayerMovement] Initialized - Waiting for landing...");
-        Debug.Log("[PlayerMovement] ✅ Jump Curve RESET to correct parabola!");
-        
-        // Verify curve
-        Debug.Log($"[PlayerMovement] 🎨 Jump Curve keyframes count: {_jumpCurve.keys.Length}");
-        for (int i = 0; i < _jumpCurve.keys.Length; i++)
-        {
-            Keyframe key = _jumpCurve.keys[i];
-            Debug.Log($"[PlayerMovement] 🎨 Keyframe {i}: time={key.time:F2}, value={key.value:F2}");
-        }
+        // Initialization complete (logs removed in production)
     }
 
     /// <summary>
@@ -74,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
         {
             _hasLanded = true;
             _rb.useGravity = false;
-            Debug.Log($"[PlayerMovement] ✅ First landing! Gravity disabled.");
+            // First landing: gravity disabled
         }
 
         // Lưu Y position TRƯỚC khi update
@@ -83,10 +74,7 @@ public class PlayerMovement : MonoBehaviour
         // Cập nhật base height từ world position hiện tại
         _baseHeight = transform.position.y;
 
-        Debug.Log($"[PlayerMovement] 📍 Landed! Old base: {oldBaseHeight:F3} → New base: {_baseHeight:F3}");
-        Debug.Log($"[PlayerMovement] 📍 Current position: {transform.position}");
-        Debug.Log($"[PlayerMovement] 📍 Parent: {(transform.parent != null ? transform.parent.name : "NULL")}");
-        Debug.Log($"[PlayerMovement] 📍 _hasLanded: {_hasLanded}, useGravity: {_rb.useGravity}");
+    // Land info updated (debug logs removed)
     }
 
     private void Update()
@@ -117,11 +105,10 @@ public class PlayerMovement : MonoBehaviour
     {
         // Đợi đủ lâu cho jump hoàn tất (_jumpTime + buffer)
         yield return new WaitForSeconds(_jumpTime + 0.2f);
-        
+
         // Nếu sau khi jump xong mà vẫn không có parent = miss platform
         if (!_isGameOver && transform.parent == null && !_isJumping)
         {
-            Debug.Log("[PlayerMovement] ⚠️ MISSED PLATFORM - Enabling gravity!");
             EnablePhysicsOnGameOver();
         }
     }
@@ -131,15 +118,12 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void Jump()
     {
-        Debug.Log($"[PlayerMovement] ========== JUMP CALLED ==========");
-        Debug.Log($"[PlayerMovement] Current parent: {(transform.parent != null ? transform.parent.name : "NULL")}");
+    // Jump called (debug logs removed)
         
         // QUAN TRỌNG: Tách khỏi platform trước khi nhảy để có thể control world position
         if (transform.parent != null)
         {
-            string parentName = transform.parent.name;
             transform.parent = null;
-            Debug.Log($"[PlayerMovement] ✂️ DETACHED from platform: {parentName}");
         }
 
         _elapsedTime = 0f;
@@ -147,12 +131,9 @@ public class PlayerMovement : MonoBehaviour
         _endZ = _startZ + _gap;
         _isJumping = true;
 
-        // Reset velocity để đảm bảo không có ảnh hưởng từ physics
-        _rb.linearVelocity = Vector3.zero;
-        _rb.angularVelocity = Vector3.zero;
-
-        Debug.Log($"[PlayerMovement] 🚀 Jump started: Z {_startZ:F2} -> {_endZ:F2}");
-        Debug.Log($"[PlayerMovement] ====================================\n");
+    // Reset velocity để đảm bảo không có ảnh hưởng từ physics
+    _rb.linearVelocity = Vector3.zero;
+    _rb.angularVelocity = Vector3.zero;
     }
 
     /// <summary>
@@ -173,11 +154,10 @@ public class PlayerMovement : MonoBehaviour
         Vector3 newPosition = new Vector3(transform.position.x, currentY, currentZ);
         transform.position = newPosition;
 
-        // Log chi tiết khi kết thúc jump
+        // Detailed jump logs removed
         if (progress >= 0.95f)
         {
-            Debug.Log($"[PlayerMovement] 📍 Jump ending - Progress: {progress:F2}, CurveValue: {curveValue:F3}, JumpArc: {jumpArc:F3}");
-            Debug.Log($"[PlayerMovement] 📍 BaseHeight: {_baseHeight:F3}, CurrentY: {currentY:F3}");
+            // no-op: removed debug output
         }
     }
 
@@ -186,8 +166,6 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void Revive(Vector3 position)
     {
-        Debug.Log($"[PlayerMovement] 🔄 REVIVE called at position: {position}");
-
         _isJumping = false;
         _isGameOver = false;
         
@@ -219,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
         _endZ = position.z;
         _elapsedTime = 0f;
 
-        Debug.Log($"[PlayerMovement] ✅ Revived! Gravity ON, will fall to base. Position: {position}");
+    // Revive performed (debug logs removed)
     }
 
     /// <summary>
@@ -227,7 +205,7 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void EnablePhysicsOnGameOver()
     {
-        _isGameOver = true;
+        // _isGameOver = true;
         _isJumping = false;
         
         // Bật gravity và đảm bảo rigidbody không bị kinematic
@@ -240,6 +218,6 @@ public class PlayerMovement : MonoBehaviour
         // Reset constraints để player rơi tự do
         _rb.constraints = RigidbodyConstraints.None;
 
-        Debug.Log("[PlayerMovement] 💀 Physics enabled - Game Over! Gravity: ON, Rotation: UNFROZEN");
+    // Physics enabled for Game Over (debug logs removed)
     }
 }

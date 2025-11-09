@@ -89,11 +89,18 @@ public class LoseMenu : Menu
     private void CloseButton()
     {
         SetButtonInteractable(_closeButton, false);
-        
+
+        // Reset health về 3 hearts trước khi về Level scene
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
         DisableAllMenus();
-        
+
         StartCoroutine(LevelLoader.ReloadLevelAsync(() =>
         {
             SceneManager.LoadScene("Level");
@@ -106,7 +113,14 @@ public class LoseMenu : Menu
     private void HomeButton()
     {
         SetButtonInteractable(_homeButton, false);
-        
+
+        // Reset health về 3 hearts trước khi về Level scene
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
         DisableAllMenus();

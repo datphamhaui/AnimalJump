@@ -15,6 +15,7 @@ public class Platform : MonoBehaviour
     float newXPos = 0f;
     float _resetPos;
     bool _isOver = false;
+    bool _isFrozen = false; // Dùng cho checkpoint revival system
 
     bool _isInverted = false;
     public bool InvertPos { set { _isInverted = value; } }
@@ -36,6 +37,8 @@ public class Platform : MonoBehaviour
         GameManager.OnGameEnd += StopMoving;
         GameManager.OnRevive += MoveEnabled;
         LevelManager.OnLevelChanged += UpdateSpeed;
+        GameManager.OnPlatformFreeze += FreezeMovement;
+        GameManager.OnPlatformResume += ResumeMovement;
     }
 
     private void Start()
@@ -73,6 +76,24 @@ public class Platform : MonoBehaviour
         Debug.Log($"Platform speed updated to: {_pieceSpeed} (Level {level})");
     }
 
+    /// <summary>
+    /// Freeze platform movement (khi player miss và revive)
+    /// </summary>
+    private void FreezeMovement()
+    {
+        _isFrozen = true;
+        Debug.Log($"[Platform] Movement FROZEN");
+    }
+
+    /// <summary>
+    /// Resume platform movement (khi player landed checkpoint)
+    /// </summary>
+    private void ResumeMovement()
+    {
+        _isFrozen = false;
+        Debug.Log($"[Platform] Movement RESUMED");
+    }
+
     void GeneratePiece()
     {
         for (int i = 0; i < _seedSize; i++)
@@ -100,7 +121,7 @@ public class Platform : MonoBehaviour
 
     private void MovePieces()
     {
-        if (_isOver) return;
+        if (_isOver || _isFrozen) return;
 
         foreach (var piece in _pieceList)
         {
@@ -120,10 +141,44 @@ public class Platform : MonoBehaviour
         _isOver = true;
     }
 
+    /// <summary>
+    /// Lấy piece ở giữa platform (gần center nhất)
+    /// Dùng để revive khi player chạm boundary wall
+    /// </summary>
+    public Transform GetCenterPiece()
+    {
+        if (_pieceList == null || _pieceList.Count == 0)
+        {
+            Debug.LogWarning("[Platform] No pieces available!");
+            return null;
+        }
+
+        // Tìm piece có localPosition.x gần giữa platform nhất
+        // Center của platform là _resetPos / 2
+        float centerX = _resetPos / 2f;
+        Piece closestPiece = _pieceList[0];
+        float closestDistance = Mathf.Abs(closestPiece.transform.localPosition.x - centerX);
+
+        foreach (var piece in _pieceList)
+        {
+            float distance = Mathf.Abs(piece.transform.localPosition.x - centerX);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestPiece = piece;
+            }
+        }
+
+        Debug.Log($"[Platform] Center piece found at localX: {closestPiece.transform.localPosition.x} (center: {centerX})");
+        return closestPiece.transform;
+    }
+
     private void OnDisable()
     {
         GameManager.OnGameEnd -= StopMoving;
         GameManager.OnRevive -= MoveEnabled;
         LevelManager.OnLevelChanged -= UpdateSpeed;
+        GameManager.OnPlatformFreeze -= FreezeMovement;
+        GameManager.OnPlatformResume -= ResumeMovement;
     }
 }

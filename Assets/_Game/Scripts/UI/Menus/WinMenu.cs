@@ -229,11 +229,18 @@ public class WinMenu : Menu
     private void CloseButton()
     {
         SetButtonInteractable(_closeButton, false);
-        
+
+        // Reset health về 3 hearts trước khi về Level scene
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
         DisableAllMenus();
-        
+
         // Về scene chọn level
         StartCoroutine(LevelLoader.ReloadLevelAsync(() =>
         {
@@ -247,7 +254,14 @@ public class WinMenu : Menu
     private void HomeButton()
     {
         SetButtonInteractable(_homeButton, false);
-        
+
+        // Reset health về 3 hearts trước khi về Level scene
+        HealthManager healthManager = HealthManager.GetInstance();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
+
         // Đóng menu và disable tất cả menus trước khi chuyển scene
         SetDisable();
         DisableAllMenus();

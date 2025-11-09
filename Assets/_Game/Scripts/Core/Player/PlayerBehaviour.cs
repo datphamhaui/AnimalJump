@@ -73,10 +73,10 @@ public class PlayerBehaviour : MonoBehaviour
 
         // Reset movement (sẽ bật gravity để rơi xuống)
         _playerMovement.Revive(position);
-        
-        // KHÔNG cho phép jump ngay - phải đợi landed
-        _playerCollision.CanJump = false;
-        
+
+        // KHÔNG cho phép jump ngay - delay 1 giây sau khi landed
+        _playerCollision.DisableJumpTemporarily(1f);
+
         // Reset death state
         _isPlayerDeath = false;
 

@@ -18,6 +18,6 @@ MonoBehaviour:
   coinReward: 100
   platformSpeed: 2.3
   platformGapRange: {x: 2.55, y: 3.6}
-  safeLandingZoneRatio: 0.73
+  safeLandingZoneRatio: 0.9
   hasObstacles: 0
   speedIncreaseRate: 0
