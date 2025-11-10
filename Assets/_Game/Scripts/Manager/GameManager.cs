@@ -1,3 +1,4 @@
+// csharp
 using System;
 using _Game.Scripts.Core;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class GameManager : MonoBehaviour
 
         if (_levelManager == null)
         {
-            Debug.LogError("[GameManager] LevelManager not found! Please add LevelManager component.");
+            // LevelManager not found
         }
 
         // Lấy các managers
@@ -82,7 +83,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void HandleMiss()
     {
-        Debug.Log("[GameManager] ☠️ Missed safe zone! Game Over!");
         GameEnd();
     }
 
@@ -92,7 +92,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void HandleBoundaryCollision(Transform platform)
     {
-        Debug.Log("[GameManager] ☠️ Hit boundary wall! Game Over!");
         GameEnd();
     }
 
@@ -105,7 +104,6 @@ public class GameManager : MonoBehaviour
     {
         if (_healthManager == null)
         {
-            Debug.LogWarning("[GameManager] HealthManager not found! Skipping trap damage.");
             return;
         }
 
@@ -114,13 +112,10 @@ public class GameManager : MonoBehaviour
 
         if (!stillAlive)
         {
-            // Hết health → Game Over
-            Debug.Log($"[GameManager] ☠️ No more hearts from traps! Game Over!");
             GameEnd();
         }
         else
         {
-            Debug.Log($"[GameManager] 💔 Hit trap! Lost 1 heart. Remaining: {_healthManager.CurrentHealth}/{_healthManager.MaxHealth}");
             // Player tiếp tục chơi (không revive, chỉ mất health)
         }
     }
@@ -133,7 +128,6 @@ public class GameManager : MonoBehaviour
     {
         if (platform == null)
         {
-            Debug.LogError("[GameManager] ❌ Platform is null!");
             GameEnd();
             return;
         }
@@ -142,7 +136,6 @@ public class GameManager : MonoBehaviour
         Platform platformScript = platform.GetComponent<Platform>();
         if (platformScript == null)
         {
-            Debug.LogError("[GameManager] ❌ Platform component not found!");
             GameEnd();
             return;
         }
@@ -151,20 +144,16 @@ public class GameManager : MonoBehaviour
         Transform centerPiece = platformScript.GetCenterPiece();
         if (centerPiece == null)
         {
-            Debug.LogError("[GameManager] ❌ Center piece not found!");
             GameEnd();
             return;
         }
 
         // Set center piece làm checkpoint mới
         CheckpointManager.GetInstance().SetCheckpoint(centerPiece);
-        Debug.Log($"[GameManager] ✅ New checkpoint set to center piece: {centerPiece.name}");
 
         // Revive về center piece
         Vector3 centerPiecePos = centerPiece.position;
         Vector3 revivePos = centerPiecePos + Vector3.up * 1f; // Spawn 1 unit phía trên
-
-        Debug.Log($"[GameManager] 🔄 Reviving to center piece at {revivePos}");
 
         // Set reviving flag để disable scoring
         Piece.IsReviving = true;
@@ -189,7 +178,6 @@ public class GameManager : MonoBehaviour
     public void ResumePlatformsFromRevival()
     {
         OnPlatformResume?.Invoke();
-        Debug.Log("[GameManager] 🔓 Platforms RESUMED from revival");
     }
 
     /// <summary>
@@ -202,15 +190,12 @@ public class GameManager : MonoBehaviour
 
         if (!checkpoint.HasCheckpoint())
         {
-            Debug.LogError("[GameManager] ❌ No checkpoint available!");
             GameEnd(); // Không có checkpoint → game over
             return;
         }
 
         Vector3 checkpointPos = checkpoint.GetCheckpointPosition();
         Vector3 revivePos = checkpointPos + Vector3.up * 1f; // Spawn 1 unit phía trên piece
-
-        Debug.Log($"[GameManager] 🔄 Reviving to checkpoint at {revivePos}");
 
         // Set reviving flag để disable scoring
         Piece.IsReviving = true;
@@ -247,11 +232,6 @@ public class GameManager : MonoBehaviour
         if (basePiece != null)
         {
             CheckpointManager.GetInstance().SetCheckpoint(basePiece);
-            Debug.Log("[GameManager] ✅ Initial checkpoint set to base piece");
-        }
-        else
-        {
-            Debug.LogWarning("[GameManager] ⚠️ Base piece not found! No initial checkpoint.");
         }
 
         // Chuyển sang nhạc game khi vào scene game
@@ -278,8 +258,6 @@ public class GameManager : MonoBehaviour
         _menuController.SwitchMenu(MenuType.Lose);
 
         SoundController.GetInstance().PlayAudio(AudioType.GAMEOVER);
-        
-        Debug.Log("[GameManager] 💀 GAME OVER - Showing Lose Menu");
     }
 
     /// <summary>
@@ -290,19 +268,12 @@ public class GameManager : MonoBehaviour
         if (_isGameWon || _isGameOver) return;
         _isGameWon = true;
 
-        Debug.Log("[GameManager] 🎉 LEVEL COMPLETED!");
-
         // Tính số sao
         int stars = CalculateStars();
-        Debug.Log($"[GameManager] ⭐ Stars earned: {stars}");
 
         // Lưu tiến độ
         int currentLevel = _levelProgressManager.GetCurrentLevel();
         _levelProgressManager.CompleteLevel(currentLevel, stars);
-
-        // TODO: Add coin reward khi implement currency system
-        // LevelDataSO levelData = _levelManager.GetCurrentLevelData();
-        // CurrencyManager.AddCoins(levelData.coinReward);
 
         // Dừng game
         _player.GameOver();
@@ -366,8 +337,6 @@ public class GameManager : MonoBehaviour
 
         // Reset reviving flag
         Piece.IsReviving = false;
-
-        Debug.Log("[GameManager] 🔄 Game state reset");
     }
 
     private void UpdateLastPos(Vector3 lastPos) { _lastZpos = lastPos.z; }

@@ -1,3 +1,4 @@
+// csharp
 using _Game.Scripts.Core;
 using UnityEngine;
 
@@ -37,7 +38,6 @@ public class PlatformSpawner : MonoBehaviour
             _seclectedPieceIndex = Random.Range(0, _pieces.Length);
             _selectedPiece       = _pieces[_seclectedPieceIndex];
             _baseManager.InitializeBasePieces(this._seclectedPieceIndex);
-            Debug.Log($"[PlatformSpawner] Selected piece: {_selectedPiece.name}");
         }
     }
 
@@ -81,8 +81,6 @@ public class PlatformSpawner : MonoBehaviour
         _invertPlatform = !_invertPlatform;
 
         _platformCount++;
-
-        Debug.Log($"[PlatformSpawner] Spawned platform #{_platformCount} at Z={position.z}");
     }
 
     /// <summary>
@@ -98,7 +96,6 @@ public class PlatformSpawner : MonoBehaviour
         if (_pieces != null && _pieces.Length > 0)
         {
             _selectedPiece = _pieces[Random.Range(0, _pieces.Length)];
-            Debug.Log($"[PlatformSpawner] Reset - Selected new piece: {_selectedPiece.name}");
         }
 
         // Xóa tất cả platform đã spawn
@@ -106,7 +103,5 @@ public class PlatformSpawner : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-
-        Debug.Log("[PlatformSpawner] Reset spawner");
     }
 }
