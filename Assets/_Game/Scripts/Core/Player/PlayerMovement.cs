@@ -19,18 +19,18 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jump Arc Curve")]
     [Tooltip("Curve điều chỉnh độ cao khi nhảy (X=0->1 là thời gian, Y=0->1 là độ cao). Phải bắt đầu và kết thúc tại 0!")]
     [SerializeField] private AnimationCurve _jumpCurve = new AnimationCurve(
-        new Keyframe(0, 0),    // Bắt đầu: Y=0 (trên platform)
+        new Keyframe(0, 0), // Bắt đầu: Y=0 (trên platform)
         new Keyframe(0.5f, 1), // Giữa chừng: Y=1 (cao nhất)
-        new Keyframe(1, 0)     // Kết thúc: Y=0 (đáp xuống platform)
+        new Keyframe(1, 0) // Kết thúc: Y=0 (đáp xuống platform)
     );
 
     private Rigidbody _rb;
-    private float _elapsedTime = 0;
-    private float _startZ, _endZ;
-    private float _baseHeight; // Độ cao của base/platform (Y position)
-    private bool _isJumping = false;
-    private bool _isGameOver = false;
-    private bool _hasLanded = false; // Đã rơi xuống base chưa
+    private float     _elapsedTime = 0;
+    private float     _startZ, _endZ;
+    private float     _baseHeight; // Độ cao của base/platform (Y position)
+    private bool      _isJumping  = false;
+    private bool      _isGameOver = false;
+    private bool      _hasLanded  = false; // Đã rơi xuống base chưa
 
     // Public property để Piece có thể check
     public bool IsJumping => _isJumping;
@@ -40,15 +40,15 @@ public class PlayerMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
 
         // Setup Rigidbody
-        _rb.isKinematic = false;
-        _rb.useGravity = true; // BẬT gravity ban đầu để player rơi xuống base
+        _rb.isKinematic    = false;
+        _rb.useGravity     = true; // BẬT gravity ban đầu để player rơi xuống base
         _rb.freezeRotation = true; // Freeze rotation để không bị lật
 
         // QUAN TRỌNG: Force reset curve to correct parabola
         _jumpCurve = new AnimationCurve(
-            new Keyframe(0f, 0f),    // Bắt đầu: Y=0 (trên platform)
-            new Keyframe(0.5f, 1f),  // Giữa chừng: Y=1 (cao nhất)
-            new Keyframe(1f, 0f)     // Kết thúc: Y=0 (đáp xuống platform)
+            new Keyframe(0f, 0f), // Bắt đầu: Y=0 (trên platform)
+            new Keyframe(0.5f, 1f), // Giữa chừng: Y=1 (cao nhất)
+            new Keyframe(1f, 0f) // Kết thúc: Y=0 (đáp xuống platform)
         );
 
         // Initialization complete (logs removed in production)
@@ -63,18 +63,18 @@ public class PlayerMovement : MonoBehaviour
         // Lần đầu tiên landed - tắt gravity
         if (!_hasLanded)
         {
-            _hasLanded = true;
+            _hasLanded     = true;
             _rb.useGravity = false;
             // First landing: gravity disabled
         }
 
         // Lưu Y position TRƯỚC khi update
         float oldBaseHeight = _baseHeight;
-        
+
         // Cập nhật base height từ world position hiện tại
         _baseHeight = transform.position.y;
 
-    // Land info updated (debug logs removed)
+        // Land info updated (debug logs removed)
     }
 
     private void Update()
@@ -90,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
             if (progress >= 1f)
             {
                 _isJumping = false;
-                
+
                 // SAFETY CHECK: Nếu jump xong mà vẫn chưa landed = miss platform
                 // Delay check một chút để cho collision system xử lý
                 StartCoroutine(CheckMissedPlatform());
@@ -118,8 +118,8 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void Jump()
     {
-    // Jump called (debug logs removed)
-        
+        // Jump called (debug logs removed)
+
         // QUAN TRỌNG: Tách khỏi platform trước khi nhảy để có thể control world position
         if (transform.parent != null)
         {
@@ -127,13 +127,13 @@ public class PlayerMovement : MonoBehaviour
         }
 
         _elapsedTime = 0f;
-        _startZ = transform.position.z;
-        _endZ = _startZ + _gap;
-        _isJumping = true;
+        _startZ      = transform.position.z;
+        _endZ        = _startZ + _gap;
+        _isJumping   = true;
 
-    // Reset velocity để đảm bảo không có ảnh hưởng từ physics
-    _rb.linearVelocity = Vector3.zero;
-    _rb.angularVelocity = Vector3.zero;
+        // Reset velocity để đảm bảo không có ảnh hưởng từ physics
+        _rb.linearVelocity  = Vector3.zero;
+        _rb.angularVelocity = Vector3.zero;
     }
 
     /// <summary>
@@ -147,8 +147,8 @@ public class PlayerMovement : MonoBehaviour
         // Tính độ cao Y theo curve (tạo arc cho jump)
         // _baseHeight + arc height để player không rơi xuống dưới base
         float curveValue = _jumpCurve.Evaluate(progress);
-        float jumpArc = curveValue * _jumpHeight;
-        float currentY = _baseHeight + jumpArc;
+        float jumpArc    = curveValue * _jumpHeight;
+        float currentY   = _baseHeight + jumpArc;
 
         // Cập nhật vị trí (world position)
         Vector3 newPosition = new Vector3(transform.position.x, currentY, currentZ);
@@ -166,26 +166,26 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void Revive(Vector3 position)
     {
-        _isJumping = false;
+        _isJumping  = false;
         _isGameOver = false;
-        
+
         // QUAN TRỌNG: Set _hasLanded = FALSE để player rơi xuống base
         _hasLanded = false;
 
         // Reset physics và BẬT gravity để rơi xuống
-        _rb.linearVelocity = Vector3.zero;
+        _rb.linearVelocity  = Vector3.zero;
         _rb.angularVelocity = Vector3.zero;
-        _rb.isKinematic = false;
-        _rb.useGravity = true; // BẬT gravity để rơi xuống base
-        
+        _rb.isKinematic     = false;
+        _rb.useGravity      = true; // BẬT gravity để rơi xuống base
+
         // Reset rotation constraints
         _rb.freezeRotation = true;
-        _rb.constraints = RigidbodyConstraints.FreezeRotation;
+        _rb.constraints    = RigidbodyConstraints.FreezeRotation;
 
         // Reset rotation và position
         transform.eulerAngles = Vector3.zero;
-        transform.position = position;
-        
+        transform.position    = position;
+
         // Tách khỏi parent nếu có
         transform.parent = null;
 
@@ -193,11 +193,11 @@ public class PlayerMovement : MonoBehaviour
         _baseHeight = 0f;
 
         // Reset jump values
-        _startZ = position.z;
-        _endZ = position.z;
+        _startZ      = position.z;
+        _endZ        = position.z;
         _elapsedTime = 0f;
 
-    // Revive performed (debug logs removed)
+        // Revive performed (debug logs removed)
     }
 
     /// <summary>
@@ -205,23 +205,24 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void EnablePhysicsOnGameOver()
     {
-        if(this._rb == null)
+        if (this._rb == null)
         {
             _rb = this.GetComponent<Rigidbody>();
         }
+
         // _isGameOver = true;
         _isJumping = false;
-        
+
         // Bật gravity và đảm bảo rigidbody không bị kinematic
         _rb.isKinematic = false;
-        _rb.useGravity = true;
-        
+        _rb.useGravity  = true;
+
         // Unfreeze rotation để player có thể xoay khi rơi
         _rb.freezeRotation = false;
-        
+
         // Reset constraints để player rơi tự do
         _rb.constraints = RigidbodyConstraints.None;
 
-    // Physics enabled for Game Over (debug logs removed)
+        // Physics enabled for Game Over (debug logs removed)
     }
 }
