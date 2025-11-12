@@ -43,7 +43,7 @@ public class Coin : MonoBehaviour
         }
     }
 
-    private void CollectCoin()
+    public void CollectCoin()
     {
         _isCollected = true;
 

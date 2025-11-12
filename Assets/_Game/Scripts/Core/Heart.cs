@@ -42,7 +42,7 @@ public class Heart : MonoBehaviour
         }
     }
 
-    private void CollectHeart()
+    public void CollectHeart()
     {
         _isCollected = true;
 

@@ -147,16 +147,16 @@ public class Platform : MonoBehaviour
             newPiece.transform.localPosition += Vector3.right * newXPos;
 
             // Apply scale theo trục X (giữ nguyên Y và Z)
-            Vector3 originalScale = newPiece.transform.localScale;
+            Vector3 originalScale = newPiece._cubeObject.transform.localScale;
 
-            newPiece.transform.localScale = new Vector3(
+            newPiece._cubeObject.transform.localScale = new Vector3(
                 originalScale.x * pieceScale,
                 originalScale.y,
                 originalScale.z
             );
 
             // Điều chỉnh scale của pickup objects để chúng không bị ảnh hưởng bởi piece scaling
-            newPiece.AdjustPickupScales(pieceScale);
+            // newPiece.AdjustPickupScales(pieceScale);
 
             _pieceList.Add(newPiece);
 

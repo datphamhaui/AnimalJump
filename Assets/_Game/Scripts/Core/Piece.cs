@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -83,8 +84,6 @@ public class Piece : MonoBehaviour
 
     private void Start()
     {
-        _renderer.material = _data.GetRandomMaterial;
-
         // Lấy safe landing zone từ LevelManager
         _levelManager = FindFirstObjectByType<LevelManager>();
 
@@ -246,7 +245,18 @@ public class Piece : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision c)
+    public void OnCollisionEnterFromChild(Collision c)
+    {
+        // Gọi lại đúng logic bạn đang có
+        HandleCollision(c);
+        if (this._coin.gameObject.activeSelf) this._coin.CollectCoin();
+        if (this._heart.gameObject.activeSelf) this._heart.CollectHeart();
+        if (this._trap.gameObject.activeSelf) this._trap.TriggerTrap();
+        
+
+    }
+
+    private void HandleCollision(Collision c)
     {
         // Đánh dấu player đã landed và đang trên piece
         _playerHasLanded = true;
