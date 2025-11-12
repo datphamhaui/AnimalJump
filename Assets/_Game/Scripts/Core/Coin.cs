@@ -39,7 +39,7 @@ public class Coin : MonoBehaviour
         if (other.CompareTag("Player") && !_isCollected)
         {
             Debug.Log("coin collected");
-            CollectCoin();
+            // CollectCoin();
         }
     }
 

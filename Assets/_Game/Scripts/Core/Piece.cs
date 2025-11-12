@@ -313,14 +313,24 @@ public class Piece : MonoBehaviour
 
         SoundController.GetInstance().PlayAudio(AudioType.LANDING);
     }
+    
+    public void OnCollisionStayFromChild(Collision c)
+    {
+        HandleCollisionStay(c);
+    }
 
-    private void OnCollisionStay(Collision c)
+    private void HandleCollisionStay(Collision c)
     {
         // Player vẫn đang chạm piece
         _isPlayerOnPiece = true;
     }
 
-    private void OnCollisionExit(Collision c)
+    public void OnCollisionExitFromChild(Collision c)
+    {
+        HandleCollisionExit(c);
+    }
+
+    private void HandleCollisionExit(Collision c)
     {
         // Đánh dấu player không còn chạm piece
         _isPlayerOnPiece = false;

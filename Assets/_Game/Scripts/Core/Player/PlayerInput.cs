@@ -65,9 +65,22 @@ public class PlayerInput : MonoBehaviour
         if (EventSystem.current == null)
             return false;
 
-        if (touchId >= 0)
-            return EventSystem.current.IsPointerOverGameObject(touchId);
+#if UNITY_EDITOR || UNITY_STANDALONE
+    // PC: Dùng con trỏ chuột
+    return EventSystem.current.IsPointerOverGameObject();
+#else
+        // Mobile: Dùng raycast để kiểm tra UI
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+
+        if (touchId >= 0 && Input.touchCount > 0)
+            eventData.position = Input.touches[touchId].position;
         else
-            return EventSystem.current.IsPointerOverGameObject();
+            eventData.position = Input.mousePosition;
+
+        var results = new System.Collections.Generic.List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        return results.Count > 0;
+#endif
     }
 }

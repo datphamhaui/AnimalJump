@@ -38,7 +38,7 @@ public class Heart : MonoBehaviour
         // Kiểm tra xem có phải player không
         if (other.CompareTag("Player") && !_isCollected)
         {
-            CollectHeart();
+            // CollectHeart();
         }
     }
 

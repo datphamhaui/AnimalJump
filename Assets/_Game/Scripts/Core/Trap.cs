@@ -41,7 +41,7 @@ public class Trap : MonoBehaviour
         if (other.CompareTag("Player") && !_isTriggered)
         {
             Debug.Log("[Trap] Player hit trap!");
-            TriggerTrap();
+            // TriggerTrap();
         }
     }
 
@@ -134,20 +134,51 @@ public class Trap : MonoBehaviour
         // Xoay nhanh cuối cùng
         LeanTween.rotateLocal(gameObject, Vector3.up * 1800f, 0.2f).setEase(LeanTweenType.easeInExpo);
         
-        // Fade out dramatic
+        // Fade out dramatic - Safe material handling
         Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        if (renderer != null && renderer.material != null)
         {
-            Color originalColor = renderer.material.color;
-            LeanTween.value(gameObject, 1f, 0f, 0.2f)
-                .setOnUpdate((float val) => {
-                    if (renderer != null && renderer.material != null)
-                    {
-                        Color newColor = originalColor;
-                        newColor.a = val;
-                        renderer.material.color = newColor;
-                    }
-                });
+            Material mat = renderer.material;
+            
+            // Kiểm tra xem material có property color không
+            if (mat.HasProperty("_Color"))
+            {
+                Color originalColor = mat.color;
+                LeanTween.value(gameObject, 1f, 0f, 0.2f)
+                    .setOnUpdate((float val) => {
+                        if (renderer != null && renderer.material != null)
+                        {
+                            Color newColor = originalColor;
+                            newColor.a = val;
+                            renderer.material.color = newColor;
+                        }
+                    });
+            }
+            else if (mat.HasProperty("_BaseColor"))
+            {
+                // Thử với URP/HDRP materials
+                Color originalColor = mat.GetColor("_BaseColor");
+                LeanTween.value(gameObject, 1f, 0f, 0.2f)
+                    .setOnUpdate((float val) => {
+                        if (renderer != null && renderer.material != null)
+                        {
+                            Color newColor = originalColor;
+                            newColor.a = val;
+                            renderer.material.SetColor("_BaseColor", newColor);
+                        }
+                    });
+            }
+            else
+            {
+                // Nếu không có color property, chỉ làm fade bằng cách tắt renderer
+                LeanTween.value(gameObject, 1f, 0f, 0.2f)
+                    .setOnUpdate((float val) => {
+                        if (renderer != null)
+                        {
+                            renderer.enabled = val > 0.1f;
+                        }
+                    });
+            }
         }
         
         yield return new WaitForSeconds(0.2f);
